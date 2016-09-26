@@ -29,7 +29,7 @@ class LoginView {
 				$message = 'Password is missing';
 			} else {
 				$lc = new LoginController();
-        		$lc->login($_POST);
+        		$message = $lc->login($_POST);
     		}
 		} else {
 			$message = '';

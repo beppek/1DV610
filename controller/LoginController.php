@@ -3,8 +3,8 @@
 
 class LoginController {
 
-    public function login() {
-        var_dump($_POST);
+    public function login($postData) {
+        return "Wrong name or password";
     }
 
 }
