@@ -18,19 +18,42 @@ class RegisterView extends FormView {
      * Call if url param is ?register
      */
      public function response() {
-         return $this->generateRegisterFormHTML("");
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			if (empty($_POST["RegisterView::UserName"]) && empty($_POST["RegisterView::Password"])) {
+                $messages = ['Username has too few characters, at least 3 characters.', 'Password has too few characters, at least 6 characters.'];
+            } else if (strlen($_POST["RegisterView::UserName"]) < 3) {
+                $messages = ['Username has too few characters, at least 3 characters.'];
+            } else if (strlen($_POST["RegisterView::Password"]) < 6) {
+                $messages = ['Password has too few characters, at least 6 characters.'];
+			} else {
+                // Try to register user
+				$rc = new RegisterController();
+        		$rc->checkInput($_POST);
+                $messages = ["Good!"];
+    		}
+		} else {
+			$messages = [];
+		}
+         $response = $this->generateRegisterFormHTML($messages);
+         return $response;
      }
 
-     private function generateRegisterFormHTML($message) {
+     private function generateRegisterFormHTML($messages) {
+         if (isset($_POST["RegisterView::UserName"])) {
+			$username = $_POST["RegisterView::UserName"];
+		} else {
+			$username = "";
+		}
 		return '
             <h2>Register new user</h2>
 			<form method="post" action="?register">
 				<fieldset>
 					<legend>Register a new user - Write username and password</legend>
-					<p id="' . self::$messageId . '">' . $message . '</p>
+                    <p id="' . self::$messageId . '">' . $this->renderMessages($messages) . '</p>
+
 
 					<label for="' . self::$name . '">Username :</label>
-					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="" />
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $username . '" />
                     <br>
 					<label for="' . self::$password . '">Password :</label>
 					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
@@ -44,6 +67,18 @@ class RegisterView extends FormView {
 			</form>
 		';
 	}
+
+    private function renderMessages($messages) {
+        $str = "";
+        if (count($messages) == 0) {
+            return $str;
+        } else {
+            foreach($messages as $message) {
+                $str .= $message . '<br>';
+            }
+        }
+        return $str;
+    }
 
 
 }
