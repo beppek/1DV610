@@ -1,6 +1,5 @@
 <?php
 
-
 class LoginController {
 
     public function login($postData) {

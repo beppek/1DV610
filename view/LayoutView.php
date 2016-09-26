@@ -29,7 +29,10 @@ class LayoutView {
       return '<h2>Logged in</h2>';
     }
     else {
-      return '<h2>Not logged in</h2>';
+      return '
+              <a href="?register">Register a new user</a>
+              <h2>Not logged in</h2>
+              ';
     }
   }
 }
