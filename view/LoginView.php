@@ -1,8 +1,9 @@
 <?php
 
 require_once('controller/LoginController.php');
+require_once('view/FormView.php');
 
-class LoginView {
+class LoginView extends FormView {
 	private static $login = 'LoginView::Login';
 	private static $logout = 'LoginView::Logout';
 	private static $name = 'LoginView::UserName';
@@ -11,8 +12,6 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
-
-
 
 	/**
 	 * Create HTTP response

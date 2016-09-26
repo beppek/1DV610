@@ -1,7 +1,49 @@
 <?php
 
-class RegisterView {
+require_once('controller/RegisterController.php');
+require_once('view/FormView.php');
 
+class RegisterView extends FormView {
+    private static $register = 'RegisterView::Register';
+    private static $name = 'RegisterView::UserName';
+    private static $password = 'RegisterView::Password';
+    private static $passwordRepeat = 'RegisterView::PasswordRepeat';
+	private static $cookieName = 'RegisterView::CookieName';
+	private static $cookiePassword = 'RegisterView::CookiePassword';
+    private static $messageId = 'RegisterView::Message';
+
+    /**
+     * Create HTTP response
+     *
+     * Call if url param is ?register
+     */
+     public function response() {
+         return $this->generateRegisterFormHTML("");
+     }
+
+     private function generateRegisterFormHTML($message) {
+		return '
+            <h2>Register new user</h2>
+			<form method="post" action="?register">
+				<fieldset>
+					<legend>Register a new user - Write username and password</legend>
+					<p id="' . self::$messageId . '">' . $message . '</p>
+
+					<label for="' . self::$name . '">Username :</label>
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="" />
+                    <br>
+					<label for="' . self::$password . '">Password :</label>
+					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
+                    <br>
+                    <label for="' . self::$passwordRepeat . '">Repeat password :</label>
+					<input type="password" id="' . self::$passwordRepeat . '" name="' . self::$passwordRepeat . '" />
+                    <br>
+
+					<input type="submit" name="' . self::$register . '" value="Register" />
+				</fieldset>
+			</form>
+		';
+	}
 
 
 }
