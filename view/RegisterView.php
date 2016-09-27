@@ -21,6 +21,9 @@ class RegisterView extends FormView {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $rc = new RegisterController();
             $messages = $rc->checkInput($_POST);
+            if ($messages[0] == "Passed check") {
+                $rc->registerUser($_POST);
+            }
 		} else {
 			$messages = [];
 		}
