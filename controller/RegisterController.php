@@ -1,6 +1,6 @@
 <?php
 
-require_once("model\Database.php");
+require_once("model/Database.php");
 
 class RegisterController {
 
@@ -24,6 +24,8 @@ class RegisterController {
             $messages = ['Password has too few characters, at least 6 characters.'];
         } else if ($password != $passwordRepeat){
             $messages = ["Passwords do not match."];
+        } else if (strlen(strip_tags($username)) < strlen($username)) {
+            $messages = ["Username contains invalid characters."];
         } else {
             $messages = ["Passed check"];
         }
@@ -37,13 +39,7 @@ class RegisterController {
 
         $this->db = new Database();
 
-        echo $this->db->createUser($username, $password);
-
-        // if ($this->db->createUser($username, $password)) {
-        //     echo "Awesome!";
-        // } else {
-        //     echo "Crap!";
-        // }
+        return $this->db->createUser($username, $password);
 
     }
 

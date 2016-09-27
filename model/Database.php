@@ -4,7 +4,7 @@ require_once("secrets.php");
 
 /**
  * Database class to handle calls to the database
- * Usage: require_once("model\Database.php");
+ * Usage: require_once("..\model\Database.php");
  * $db = new Database();
  */
 class Database {
@@ -12,7 +12,7 @@ class Database {
     private $db_name;
 	private $db_user;
 	private $db_pass;
-	private $db_host = "localhost";
+	private $db_host;
     // private $connected = false;
     // private $mysqli;
 
@@ -22,6 +22,8 @@ class Database {
         $this->db_name = $secrets->db_name;
         $this->db_user = $secrets->db_user;
         $this->db_pass = $secrets->db_pass;
+        // $this->db_host = $secrets->db_host;
+        $this->db_host = "localhost";
 
         $this->createDatabase();
         $this->createUserTable();
@@ -176,23 +178,26 @@ class Database {
 
         if ($result = $mysqli->query("SELECT * FROM users")) {
 
-            while($row = $result->fetch_array()) {
+            if ($result->num_rows > 0) {
 
-                $rows[] .= $row;
+                while($row = $result->fetch_array()) {
 
-            }
+                    $rows[] = $row;
 
-            foreach($rows as $row) {
-
-                if ($username === $row[1] && $password === $row[2]) {
-                    // $_SESSION["username"] = $username;
-                    // $_SESSION["password"] = $password;
-                    return true;
-
-                }else {
-                    return false;
                 }
 
+                foreach($rows as $row) {
+
+                    if ($username === $row[1] && $password === $row[2]) {
+                        // $_SESSION["username"] = $username;
+                        // $_SESSION["password"] = $password;
+                        return true;
+
+                    }else {
+                        return false;
+                    }
+
+                }
             }
 
             $result->close();
@@ -222,7 +227,7 @@ class Database {
             exit();
         }
 
-        if ($result = $mysqli->query("SELECT username FROM users")) {
+        if ($result = $mysqli->query("SELECT * FROM users")) {
 
             if ($result->num_rows > 0) {
 

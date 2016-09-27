@@ -1,6 +1,10 @@
 <?php
 
+require_once("model/Database.php");
+
 class LoginController {
+
+    private $db;
 
     public function checkInput($formData) {
 
@@ -12,10 +16,24 @@ class LoginController {
         } else if (empty($password)) {
             $message = 'Password is missing';
         } else {
-            $message = "Wrong name or password";
+            $message = "Passed check";
         }
 
         return $message;
+
+    }
+
+    public function login($user) {
+        $username = $user["LoginView::UserName"];
+        $password = $user["LoginView::Password"];
+
+        $this->db = new Database();
+
+       if ($this->db->authenticateUser($username, $password)) {
+           return "Logged in";
+       } else {
+           return "Wrong name or password";
+       }
 
     }
 

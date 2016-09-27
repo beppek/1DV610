@@ -23,7 +23,17 @@ class LoginView extends FormView {
 	public function response() {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$lc = new LoginController();
-			$message = $lc->checkInput($_POST);
+			$check = $lc->checkInput($_POST);
+			if ($check == "Passed check") {
+                $res = $lc->login($_POST);
+				if ($res === true) {
+
+				} else {
+					$message = $res;
+				}
+            } else {
+				$message = $check;
+			}
 		} else {
 			$message = '';
 		}
