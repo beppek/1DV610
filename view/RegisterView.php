@@ -19,18 +19,8 @@ class RegisterView extends FormView {
      */
      public function response() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			if (empty($_POST["RegisterView::UserName"]) && empty($_POST["RegisterView::Password"])) {
-                $messages = ['Username has too few characters, at least 3 characters.', 'Password has too few characters, at least 6 characters.'];
-            } else if (strlen($_POST["RegisterView::UserName"]) < 3) {
-                $messages = ['Username has too few characters, at least 3 characters.'];
-            } else if (strlen($_POST["RegisterView::Password"]) < 6) {
-                $messages = ['Password has too few characters, at least 6 characters.'];
-			} else {
-                // Try to register user
-				$rc = new RegisterController();
-        		$rc->checkInput($_POST);
-                $messages = ["Good!"];
-    		}
+            $rc = new RegisterController();
+            $messages = $rc->checkInput($_POST);
 		} else {
 			$messages = [];
 		}

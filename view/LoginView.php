@@ -22,14 +22,8 @@ class LoginView extends FormView {
 	 */
 	public function response() {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			if (empty($_POST["LoginView::UserName"])) {
-				$message = 'Username is missing';
-			} else if (empty($_POST["LoginView::Password"])) {
-				$message = 'Password is missing';
-			} else {
-				$lc = new LoginController();
-        		$message = $lc->login($_POST);
-    		}
+			$lc = new LoginController();
+			$message = $lc->checkInput($_POST);
 		} else {
 			$message = '';
 		}
