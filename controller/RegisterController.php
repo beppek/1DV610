@@ -3,11 +3,15 @@
 class RegisterController {
 
     public function checkInput($formData) {
-        if (empty($formData["RegisterView::UserName"]) && empty($formData["RegisterView::Password"])) {
+
+        $username = $formData["RegisterView::UserName"];
+        $password = $formData["RegisterView::Password"];
+
+        if (empty($username) && empty($password)) {
             $messages = ['Username has too few characters, at least 3 characters.', 'Password has too few characters, at least 6 characters.'];
-        } else if (strlen($formData["RegisterView::UserName"]) < 3) {
+        } else if (strlen($username) < 3) {
             $messages = ['Username has too few characters, at least 3 characters.'];
-        } else if (strlen($formData["RegisterView::Password"]) < 6) {
+        } else if (strlen($password) < 6) {
             $messages = ['Password has too few characters, at least 6 characters.'];
         } else {
             $messages = ["Passed check"];

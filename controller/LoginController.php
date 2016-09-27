@@ -4,9 +4,12 @@ class LoginController {
 
     public function checkInput($formData) {
 
-        if (empty($formData["LoginView::UserName"])) {
+        $username = $formData["LoginView::UserName"];
+        $password = $formData["LoginView::Password"];
+
+        if (empty($username)) {
             $message = 'Username is missing';
-        } else if (empty($formData["LoginView::Password"])) {
+        } else if (empty($password)) {
             $message = 'Password is missing';
         } else {
             $message = "Wrong name or password";
