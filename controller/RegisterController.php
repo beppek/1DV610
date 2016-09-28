@@ -40,7 +40,7 @@ class RegisterController {
     public function saveToDB($user) {
 
         $username = $user["RegisterView::UserName"];
-        $password = md5($user['RegisterView::Password']);
+        $password = $user['RegisterView::Password'];
 
         $this->db = new Database();
 

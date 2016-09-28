@@ -138,6 +138,8 @@ class Database {
      */
     public function createUser($username, $password) {
 
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
         $mysqli = $this->connect();
 
         if ($this->findUser($username)) {
@@ -145,7 +147,7 @@ class Database {
         }
 
         $sql = "INSERT INTO users (username, password)
-        VALUES ('$username', '$password')";
+        VALUES ('$username', '$hashedPassword')";
 
         if ($mysqli->query($sql) === TRUE) {
            return "Registered new user.";
@@ -166,31 +168,22 @@ class Database {
         $mysqli = $this->connect();
 
         if ($result = $mysqli->query("SELECT * FROM users")) {
-
             if ($result->num_rows > 0) {
 
                 while($row = $result->fetch_array()) {
-
                     $rows[] = $row;
-
                 }
 
                 foreach($rows as $row) {
-
-                    if ($username === $row[1] && $password === $row[2]) {
+                    if ($username === $row[1] && password_verify($password, $row[2])) {
                         return true;
-
                     }
-
                 }
 
                 return false;
             }
-
             $result->close();
-
         }
-
         $this->disconnect($mysqli);
     }
 
@@ -203,30 +196,23 @@ class Database {
         $mysqli = $this->connect();
 
         if ($result = $mysqli->query("SELECT * FROM users")) {
-
             if ($result->num_rows > 0) {
 
                 while($row = $result->fetch_array()) {
-
                     $rows[] = $row;
-
                 }
 
                 foreach($rows as $row) {
-
                     if ($username === $row[1]) {
                         return true;
                     }
-
                 }
 
                 return false;
             }
-
             $result->close();
 
         }
-
         $this->disconnect($mysqli);
 
     }
@@ -261,31 +247,24 @@ class Database {
         $mysqli = $this->connect();
 
         if ($result = $mysqli->query("SELECT * FROM cookies")) {
-
             if ($result->num_rows > 0) {
 
                 while($row = $result->fetch_array()) {
-
                     $rows[] = $row;
-
                 }
 
                 foreach($rows as $row) {
-
                     if ($name === $row[1] && $password === $row[2]) {
                         return true;
-
                     }
 
                 }
 
                 return false;
             }
-
             $result->close();
 
         }
-
         $this->disconnect($mysqli);
     }
 

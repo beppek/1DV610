@@ -58,6 +58,11 @@ class RegisterView extends FormView {
 		';
 	}
 
+    /**
+     * Render messages to display inside p element
+     *
+     * @param $messages - expects an array
+     */
     private function renderMessages($messages) {
         $str = '';
         if (count($messages) == 0) {

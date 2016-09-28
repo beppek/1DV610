@@ -9,7 +9,7 @@ class LoginController {
     /**
      * Checks input.
      *
-     * @return Returns string if encounters errors otherwise chains the call to login.
+     * @return Returns string if encounters errors otherwise chains the call to authenticate.
      */
     public function login($formData) {
 
@@ -35,7 +35,7 @@ class LoginController {
      */
     public function authenticate($user) {
         $username = $user["LoginView::UserName"];
-        $password = md5($user['LoginView::Password']);
+        $password = $user['LoginView::Password'];
 
         if (isset($user["LoginView::KeepMeLoggedIn"]) && $user["LoginView::KeepMeLoggedIn"] === "on") {
             $keep = true;
@@ -47,7 +47,7 @@ class LoginController {
 
         if ($this->db->authenticateUser($username, $password)) {
             $_SESSION["username"] = $username;
-            $_SESSION["password"] = $password;
+            // $_SESSION["password"] = $password;
 
             if ($keep) {
                 $cookiePassword = md5(uniqid('', true));
@@ -81,7 +81,7 @@ class LoginController {
         }
         if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             unset($_SESSION["username"]);
-            unset($_SESSION["password"]);
+            // unset($_SESSION["password"]);
             unset($_SESSION["loggedin"]);
             $_SESSION["message"] = "Bye bye!";
             session_regenerate_id();
