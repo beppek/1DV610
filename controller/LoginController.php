@@ -35,7 +35,7 @@ class LoginController {
      */
     public function login($user) {
         $username = $user["LoginView::UserName"];
-        $password = $user["LoginView::Password"];
+        $password = md5($user['LoginView::Password']);
 
         if (isset($user["LoginView::KeepMeLoggedIn"]) && $user["LoginView::KeepMeLoggedIn"] === "on") {
             $keep = true;
@@ -50,14 +50,18 @@ class LoginController {
             $_SESSION["password"] = $password;
 
             if ($keep) {
-                setcookie("username", $username);
-                setcookie("password", password_hash($password, PASSWORD_DEFAULT));
+                $cookiePassword = md5(uniqid('', true));
+                $this->db->storeCookie($username, $cookiePassword);
+                $cookieEndDate = time() + (86400 * 30);
+                setcookie("LoginView::CookieName", $username, $cookieEndDate);
+                setcookie("LoginView::CookiePassword", $cookiePassword, $cookieEndDate);
                 $_SESSION["message"] = "Welcome and you will be remembered";
             } else {
                 $_SESSION["message"] = "Welcome";
             }
 
             $_SESSION["loggedin"] = true;
+            session_regenerate_id();
             return header("Location: " . $_SERVER['PHP_SELF']);
        } else {
             return "Wrong name or password";
@@ -71,11 +75,16 @@ class LoginController {
      * @return return empty string if already logged out. Otherwise redirect
      */
     public function logout() {
+        if (isset($_COOKIE["username"])) {
+            setcookie("LoginView::CookieName", "", time() - 3600);
+            setcookie("LoginView::CookiePassword", "", time() - 3600);
+        }
         if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             unset($_SESSION["username"]);
             unset($_SESSION["password"]);
             unset($_SESSION["loggedin"]);
             $_SESSION["message"] = "Bye bye!";
+            session_regenerate_id();
             return header("Location: " . $_SERVER['PHP_SELF']);
         } else {
             $message = "";

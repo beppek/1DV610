@@ -43,7 +43,6 @@ class LoginView extends FormView {
 		} else {
 			$response = $this->generateLoginFormHTML($message);
 		}
-
 		return $response;
 
 	}

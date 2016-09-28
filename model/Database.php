@@ -24,6 +24,7 @@ class Database {
 
         $this->createDatabase();
         $this->createUserTable();
+        $this->createCookieTable();
     }
 
     /**
@@ -91,7 +92,33 @@ class Database {
         $sql = "CREATE TABLE IF NOT EXISTS users (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(30) NOT NULL,
-        password VARCHAR(30) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        reg_date TIMESTAMP
+        )";
+
+        if ($mysqli->query($sql) === TRUE) {
+
+        } else {
+            return "Error creating table: " . $mysqli->error;
+        }
+
+        $this->disconnect($mysqli);
+
+    }
+
+    /**
+     * Create cookie table in database if not exists
+     * Only call from constructor
+     * @return if error creating table return
+     */
+    private function createCookieTable() {
+
+        $mysqli = $this->connect();
+
+        $sql = "CREATE TABLE IF NOT EXISTS cookies (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        cookiename VARCHAR(30) NOT NULL,
+        password VARCHAR(255) NOT NULL,
         reg_date TIMESTAMP
         )";
 
@@ -202,6 +229,64 @@ class Database {
 
         $this->disconnect($mysqli);
 
+    }
+
+    /**
+     * Stores the cookie with password in db to verify
+     */
+    public function storeCookie($name, $password) {
+
+        $mysqli = $this->connect();
+
+        $sql = "INSERT INTO cookies (cookiename, password)
+        VALUES ('$name', '$password')";
+
+        if ($mysqli->query($sql) === TRUE) {
+            return true;
+        } else {
+            return $mysqli->error;
+        }
+
+        $this->disconnect($mysqli);
+
+    }
+
+    /**
+     * Find and verify the cookie
+     *
+     * @return true if cookie is found and password is correct, else returns false
+     */
+    public function verifyCookie($name, $password) {
+
+        $mysqli = $this->connect();
+
+        if ($result = $mysqli->query("SELECT * FROM cookies")) {
+
+            if ($result->num_rows > 0) {
+
+                while($row = $result->fetch_array()) {
+
+                    $rows[] = $row;
+
+                }
+
+                foreach($rows as $row) {
+
+                    if ($name === $row[1] && $password === $row[2]) {
+                        return true;
+
+                    }
+
+                }
+
+                return false;
+            }
+
+            $result->close();
+
+        }
+
+        $this->disconnect($mysqli);
     }
 
 }

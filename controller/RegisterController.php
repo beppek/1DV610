@@ -40,7 +40,7 @@ class RegisterController {
     public function registerUser($user) {
 
         $username = $user["RegisterView::UserName"];
-        $password = $user["RegisterView::Password"];
+        $password = md5($user['RegisterView::Password']);
 
         $this->db = new Database();
 
@@ -49,6 +49,7 @@ class RegisterController {
         if ($res == "Registered new user.") {
             $_SESSION["username"] = $username;
             $_SESSION["message"] = $res;
+            session_regenerate_id();
             header("Location: " . $_SERVER['PHP_SELF']);
             exit;
         } else {
