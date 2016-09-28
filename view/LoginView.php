@@ -22,7 +22,6 @@ class LoginView extends FormView {
 	 */
 	public function response() {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			var_dump($_POST);
 			if (isset($_POST["LoginView::Logout"])) {
 				unset($_SESSION["username"]);
 				unset($_SESSION["password"]);

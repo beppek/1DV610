@@ -135,6 +135,7 @@ class Database {
      * @return true if user is found and password is correct, else returns false
      */
     public function authenticateUser($username, $password) {
+
         $mysqli = $this->connect();
 
         if ($result = $mysqli->query("SELECT * FROM users")) {
@@ -152,11 +153,11 @@ class Database {
                     if ($username === $row[1] && $password === $row[2]) {
                         return true;
 
-                    }else {
-                        return false;
                     }
 
                 }
+
+                return false;
             }
 
             $result->close();
