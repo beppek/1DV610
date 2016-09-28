@@ -22,24 +22,39 @@ class LoginView extends FormView {
 	 */
 	public function response() {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			$lc = new LoginController();
-			$check = $lc->checkInput($_POST);
-			if ($check == "Passed check") {
-                $res = $lc->login($_POST);
-				if ($res === true) {
+			var_dump($_POST);
+			if (isset($_POST["LoginView::Logout"])) {
+				unset($_SESSION["username"]);
+				unset($_SESSION["password"]);
+				unset($_SESSION["loggedin"]);
+				header("Location: " . $_SERVER['PHP_SELF']);
+			} else {
+				$lc = new LoginController();
+				$check = $lc->checkInput($_POST);
+				if ($check == "Passed check") {
+					$res = $lc->login($_POST);
+					if ($res === true) {
 
+					} else {
+						$message = $res;
+					}
 				} else {
-					$message = $res;
+					$message = $check;
 				}
-            } else {
-				$message = $check;
 			}
+		} else if (isset($_SESSION["message"])) {
+			$message = $_SESSION["message"];
+			unset($_SESSION["message"]);
 		} else {
 			$message = '';
 		}
 
-		$response = $this->generateLoginFormHTML($message);
-		//$response .= $this->generateLogoutButtonHTML($message);
+		if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+			$response = $this->generateLogoutButtonHTML($message);
+		} else {
+			$response = $this->generateLoginFormHTML($message);
+		}
+
 		return $response;
 	}
 
@@ -63,8 +78,12 @@ class LoginView extends FormView {
 	* @return  void, BUT writes to standard output!
 	*/
 	private function generateLoginFormHTML($message) {
+
 		if (isset($_POST["LoginView::UserName"])) {
 			$username = $_POST["LoginView::UserName"];
+		} else if (isset($_SESSION["username"])) {
+			$username = $_SESSION["username"];
+			unset($_SESSION["username"]);
 		} else {
 			$username = "";
 		}

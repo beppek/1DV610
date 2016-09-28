@@ -16,8 +16,12 @@ $dtv = new DateTimeView();
 $lv = new LayoutView();
 $rv = new RegisterView();
 
+session_start();
+
 if (isset($_GET['register'])) {
     $lv->render(false, $rv, $dtv);
+} else if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true ) {
+    $lv->render(true, $v, $dtv);
 } else {
     $lv->render(false, $v, $dtv);
 }

@@ -30,7 +30,11 @@ class LoginController {
         $this->db = new Database();
 
        if ($this->db->authenticateUser($username, $password)) {
-           return "Logged in";
+           $_SESSION["username"] = $username;
+           $_SESSION["password"] = $password;
+           $_SESSION["message"] = "Welcome";
+           $_SESSION["loggedin"] = true;
+           header("Location: " . $_SERVER['PHP_SELF']);
        } else {
            return "Wrong name or password";
        }

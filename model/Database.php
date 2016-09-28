@@ -13,8 +13,6 @@ class Database {
 	private $db_user;
 	private $db_pass;
 	private $db_host;
-    // private $connected = false;
-    // private $mysqli;
 
     public function __construct() {
         $secrets = new Secrets();
@@ -22,7 +20,6 @@ class Database {
         $this->db_name = $secrets->db_name;
         $this->db_user = $secrets->db_user;
         $this->db_pass = $secrets->db_pass;
-        // $this->db_host = $secrets->db_host;
         $this->db_host = "localhost";
 
         $this->createDatabase();
@@ -31,7 +28,7 @@ class Database {
 
     /**
      * Creates the database if not exists.
-     * Can only be created from constructor
+     * Only call from constructor
      */
     private function createDatabase() {
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass);
@@ -41,15 +38,12 @@ class Database {
 
         $sql = "CREATE DATABASE IF NOT EXISTS workingholidayg";
         if ($mysqli->query($sql) === TRUE) {
-            $this->connected = true;
             return true;
         } else {
-            $this->connected = false;
             return false;
         }
 
         $mysqli->close();
-        $this->connected = false;
 
     }
 
@@ -59,43 +53,6 @@ class Database {
      */
     public function connect() {
 
-        if ($this->connected == false) {
-            $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
-
-            if ($mysqli->connect_errno) {
-                printf("Connect failed: %s\n", $mysqli->connect_error);
-                $this->connected = false;
-                exit();
-            } else {
-                return true;
-            }
-
-        }
-
-    }
-
-    /**
-     * Disconnects if connection exists
-     */
-    public function disconnect() {
-
-        if ($this->connected != false) {
-            $this->mysqli->close();
-            $this->connected = false;
-        }
-
-    }
-
-    /**
-     * Create user table in database if not exists
-     * @return if error creating table return
-     */
-    private function createUserTable() {
-
-        if ($this->connected == false) {
-            // $this->connect();
-        }
-
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
 
         if ($mysqli->connect_errno) {
@@ -103,6 +60,33 @@ class Database {
             $this->connected = false;
             exit();
         }
+
+        $this->connected = true;
+        return $mysqli;
+
+
+    }
+
+    /**
+     * Disconnects if connection exists
+     */
+    public function disconnect($mysqli) {
+
+        if ($this->connected != false) {
+            $mysqli->close();
+            $this->connected = false;
+        }
+
+    }
+
+    /**
+     * Create user table in database if not exists
+     * Only call from constructor
+     * @return if error creating table return
+     */
+    private function createUserTable() {
+
+        $mysqli = $this->connect();
 
         $sql = "CREATE TABLE IF NOT EXISTS users (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -117,45 +101,32 @@ class Database {
             return "Error creating table: " . $mysqli->error;
         }
 
-        $mysqli->close();
-        $this->connected = false;
-
-        // $this->disconnect();
+        $this->disconnect($mysqli);
 
     }
 
     /**
      * Create user in database
+     * @return text string with information on the result
      */
     public function createUser($username, $password) {
 
-        if ($this->connected == false) {
-            // $this->connect();
-        }
+        $mysqli = $this->connect();
 
         if ($this->findUser($username)) {
             return "User exists, pick another username.";
-        }
-
-        $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
-
-        if ($mysqli->connect_errno) {
-            printf("Connect failed: %s\n", $mysqli->connect_error);
-            $this->connected = false;
-            exit();
         }
 
         $sql = "INSERT INTO users (username, password)
         VALUES ('$username', '$password')";
 
         if ($mysqli->query($sql) === TRUE) {
-           return "User successfully created";
+           return "Registered new user.";
         } else {
             return $mysqli->error;
         }
 
-        $mysqli->close();
-        $this->connected = false;
+        $this->disconnect($mysqli);
 
     }
 
@@ -164,17 +135,7 @@ class Database {
      * @return true if user is found and password is correct, else returns false
      */
     public function authenticateUser($username, $password) {
-        if ($this->connected == false) {
-            // $this->connect();
-        }
-
-        $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
-
-        if ($mysqli->connect_errno) {
-            printf("Connect failed: %s\n", $mysqli->connect_error);
-            $this->connected = false;
-            exit();
-        }
+        $mysqli = $this->connect();
 
         if ($result = $mysqli->query("SELECT * FROM users")) {
 
@@ -189,8 +150,6 @@ class Database {
                 foreach($rows as $row) {
 
                     if ($username === $row[1] && $password === $row[2]) {
-                        // $_SESSION["username"] = $username;
-                        // $_SESSION["password"] = $password;
                         return true;
 
                     }else {
@@ -204,9 +163,7 @@ class Database {
 
         }
 
-        $mysqli->close();
-        $this->connected = false;
-        // $this->disconnect();
+        $this->disconnect($mysqli);
     }
 
     /**
@@ -215,17 +172,7 @@ class Database {
      */
     public function findUser($username) {
 
-        if ($this->connected == false) {
-            // $this->connect();
-        }
-
-        $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
-
-        if ($mysqli->connect_errno) {
-            printf("Connect failed: %s\n", $mysqli->connect_error);
-            $this->connected = false;
-            exit();
-        }
+        $mysqli = $this->connect();
 
         if ($result = $mysqli->query("SELECT * FROM users")) {
 
@@ -241,21 +188,18 @@ class Database {
 
                     if ($username === $row[1]) {
                         return true;
-
-                    }else {
-                        return false;
                     }
 
                 }
+
+                return false;
             }
 
             $result->close();
 
         }
 
-        $mysqli->close();
-        $this->connected = false;
-        // $this->disconnect();
+        $this->disconnect($mysqli);
 
     }
 

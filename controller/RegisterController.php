@@ -32,6 +32,11 @@ class RegisterController {
         return $messages;
     }
 
+    /**
+     * Register user.
+     * @param $user should be the $_POST data
+     * @return response from Database->createUser().
+     */
     public function registerUser($user) {
 
         $username = $user["RegisterView::UserName"];
@@ -39,7 +44,16 @@ class RegisterController {
 
         $this->db = new Database();
 
-        return $this->db->createUser($username, $password);
+        $res = $this->db->createUser($username, $password);
+
+        if ($res == "Registered new user.") {
+            $_SESSION["username"] = $username;
+            $_SESSION["message"] = $res;
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+        } else {
+            return $res;
+        }
 
     }
 
