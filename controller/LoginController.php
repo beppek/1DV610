@@ -37,16 +37,30 @@ class LoginController {
         $username = $user["LoginView::UserName"];
         $password = $user["LoginView::Password"];
 
+        if (isset($user["LoginView::KeepMeLoggedIn"]) && $user["LoginView::KeepMeLoggedIn"] === "on") {
+            $keep = true;
+        } else {
+            $keep = false;
+        }
+
         $this->db = new Database();
 
-       if ($this->db->authenticateUser($username, $password)) {
-           $_SESSION["username"] = $username;
-           $_SESSION["password"] = $password;
-           $_SESSION["message"] = "Welcome";
-           $_SESSION["loggedin"] = true;
-           return header("Location: " . $_SERVER['PHP_SELF']);
+        if ($this->db->authenticateUser($username, $password)) {
+            $_SESSION["username"] = $username;
+            $_SESSION["password"] = $password;
+
+            if ($keep) {
+                setcookie("username", $username);
+                setcookie("password", password_hash($password, PASSWORD_DEFAULT));
+                $_SESSION["message"] = "Welcome and you will be remembered";
+            } else {
+                $_SESSION["message"] = "Welcome";
+            }
+
+            $_SESSION["loggedin"] = true;
+            return header("Location: " . $_SERVER['PHP_SELF']);
        } else {
-           return "Wrong name or password";
+            return "Wrong name or password";
        }
 
     }
