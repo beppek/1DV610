@@ -10,7 +10,7 @@ class RegisterController {
      * Check user input
      * @return messages to display on the page
      */
-    public function checkInput($formData) {
+    public function registerUser($formData) {
 
         $username = $formData["RegisterView::UserName"];
         $password = $formData["RegisterView::Password"];
@@ -27,7 +27,7 @@ class RegisterController {
         } else if (strlen(strip_tags($username)) < strlen($username)) {
             $messages = ["Username contains invalid characters."];
         } else {
-            $messages = ["Passed check"];
+            return $this->saveToDB($formData);
         }
         return $messages;
     }
@@ -35,23 +35,22 @@ class RegisterController {
     /**
      * Register user.
      * @param $user should be the $_POST data
-     * @return response from Database->createUser().
+     * @return array response from Database->createUser().
      */
-    public function registerUser($user) {
+    public function saveToDB($user) {
 
         $username = $user["RegisterView::UserName"];
         $password = md5($user['RegisterView::Password']);
 
         $this->db = new Database();
 
-        $res = $this->db->createUser($username, $password);
+        $res[] = $this->db->createUser($username, $password);
 
-        if ($res == "Registered new user.") {
+        if ($res[0] == "Registered new user.") {
             $_SESSION["username"] = $username;
-            $_SESSION["message"] = $res;
+            $_SESSION["message"] = $res[0];
             session_regenerate_id();
-            header("Location: " . $_SERVER['PHP_SELF']);
-            exit;
+            return header("Location: " . $_SERVER['PHP_SELF']);
         } else {
             return $res;
         }

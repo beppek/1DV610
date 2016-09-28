@@ -34,20 +34,20 @@ if (isset($_SESSION['HTTP_USER_AGENT'])) {
 
 if (isset($_GET['register'])) {
     $lv->render(false, $rv, $dtv);
-} else if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true ) {
+} else if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true ) {
     $lv->render(true, $v, $dtv);
-} else if (isset($_COOKIE["LoginView::CookieName"])) {
+} else if (isset($_COOKIE['LoginView::CookieName'])) {
     $db = new Database();
-    $name = $_COOKIE["LoginView::CookieName"];
-    $password = $_COOKIE["LoginView::CookiePassword"];
+    $name = $_COOKIE['LoginView::CookieName'];
+    $password = $_COOKIE['LoginView::CookiePassword'];
     if ($db->verifyCookie($name, $password)) {
-        $_SESSION["message"] = "Welcome back with cookie";
-        $_SESSION["loggedin"] = true;
+        $_SESSION['message'] = 'Welcome back with cookie';
+        $_SESSION['loggedin'] = true;
         $lv->render(true, $v, $dtv);
     } else {
-        setcookie("LoginView::CookieName", "", time() - 3600);
-        setcookie("LoginView::CookiePassword", "", time() - 3600);
-        $_SESSION["message"] = "Wrong information in cookies";
+        setcookie('LoginView::CookieName', '', time() - 3600);
+        setcookie('LoginView::CookiePassword', '', time() - 3600);
+        $_SESSION['message'] = 'Wrong information in cookies';
         $lv->render(false, $v, $dtv);
     }
 } else {

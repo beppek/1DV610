@@ -1,6 +1,6 @@
 <?php
 
-require_once("secrets.php");
+require_once('secrets.php');
 
 /**
  * Database class to handle calls to the database

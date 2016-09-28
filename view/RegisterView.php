@@ -20,17 +20,7 @@ class RegisterView extends FormView {
      public function response() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $rc = new RegisterController();
-            $check = $rc->checkInput($_POST);
-            if ($check[0] == "Passed check") {
-                $res = $rc->registerUser($_POST);
-                if ($res === "User successfully created") {
-                    $messages[] = $res;
-				} else {
-					$messages[] = $res;
-				}
-            } else {
-                $messages = $check;
-            }
+            $messages = $rc->registerUser($_POST);
 		} else {
 			$messages = [];
 		}
@@ -39,10 +29,10 @@ class RegisterView extends FormView {
      }
 
      private function generateRegisterFormHTML($messages) {
-         if (isset($_POST["RegisterView::UserName"])) {
-			$username = strip_tags($_POST["RegisterView::UserName"]);
+         if (isset($_POST['RegisterView::UserName'])) {
+			$username = strip_tags($_POST['RegisterView::UserName']);
 		} else {
-			$username = "";
+			$username = '';
 		}
 		return '
             <h2>Register new user</h2>
@@ -69,7 +59,7 @@ class RegisterView extends FormView {
 	}
 
     private function renderMessages($messages) {
-        $str = "";
+        $str = '';
         if (count($messages) == 0) {
             return $str;
         } else {

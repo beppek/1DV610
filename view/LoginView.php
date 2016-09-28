@@ -24,21 +24,21 @@ class LoginView extends FormView {
 
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$lc = new LoginController();
-			if (isset($_POST["LoginView::Logout"])) {
+			if (isset($_POST['LoginView::Logout'])) {
 				$message = $lc->logout();
-			} else if (!isset($_SESSION["loggedin"])) {
+			} else if (!isset($_SESSION['loggedin'])) {
 				$message = $lc->login($_POST);
 			} else {
-				$message = "";
+				$message = '';
 			}
-		} else if (isset($_SESSION["message"])) {
-			$message = $_SESSION["message"];
-			unset($_SESSION["message"]);
+		} else if (isset($_SESSION['message'])) {
+			$message = $_SESSION['message'];
+			unset($_SESSION['message']);
 		} else {
 			$message = '';
 		}
 
-		if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+		if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
 			$response = $this->generateLogoutButtonHTML($message);
 		} else {
 			$response = $this->generateLoginFormHTML($message);
@@ -72,13 +72,13 @@ class LoginView extends FormView {
 	*/
 	private function generateLoginFormHTML($message) {
 
-		if (isset($_POST["LoginView::UserName"])) {
-			$username = $_POST["LoginView::UserName"];
-		} else if (isset($_SESSION["username"])) {
-			$username = $_SESSION["username"];
-			unset($_SESSION["username"]);
+		if (isset($_POST['LoginView::UserName'])) {
+			$username = $_POST['LoginView::UserName'];
+		} else if (isset($_SESSION['username'])) {
+			$username = $_SESSION['username'];
+			unset($_SESSION['username']);
 		} else {
-			$username = "";
+			$username = '';
 		}
 		return '
 			<form method="post">
