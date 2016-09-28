@@ -6,23 +6,33 @@ class LoginController {
 
     private $db;
 
+    /**
+     * Checks input.
+     *
+     * @return Returns string if encounters errors otherwise chains the call to login.
+     */
     public function checkInput($formData) {
 
         $username = $formData["LoginView::UserName"];
         $password = $formData["LoginView::Password"];
 
         if (empty($username)) {
-            $message = 'Username is missing';
+            return 'Username is missing';
         } else if (empty($password)) {
-            $message = 'Password is missing';
+            return 'Password is missing';
         } else {
-            $message = "Passed check";
+            return $this->login($formData);
         }
 
         return $message;
 
     }
 
+    /**
+     * Function to log user in.
+     *
+     * @return only returns string if login fails. Otherwise redirect
+     */
     public function login($user) {
         $username = $user["LoginView::UserName"];
         $password = $user["LoginView::Password"];
@@ -34,11 +44,29 @@ class LoginController {
            $_SESSION["password"] = $password;
            $_SESSION["message"] = "Welcome";
            $_SESSION["loggedin"] = true;
-           header("Location: " . $_SERVER['PHP_SELF']);
+           return header("Location: " . $_SERVER['PHP_SELF']);
        } else {
            return "Wrong name or password";
        }
 
+    }
+
+    /**
+     * Logout if user is logged in
+     *
+     * @return return empty string if already logged out. Otherwise redirect
+     */
+    public function logout() {
+        if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+            unset($_SESSION["username"]);
+            unset($_SESSION["password"]);
+            unset($_SESSION["loggedin"]);
+            $_SESSION["message"] = "Bye bye!";
+            return header("Location: " . $_SERVER['PHP_SELF']);
+        } else {
+            $message = "";
+        }
+        return $message;
     }
 
 }

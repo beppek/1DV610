@@ -21,25 +21,15 @@ class LoginView extends FormView {
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response() {
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			if (isset($_POST["LoginView::Logout"])) {
-				unset($_SESSION["username"]);
-				unset($_SESSION["password"]);
-				unset($_SESSION["loggedin"]);
-				header("Location: " . $_SERVER['PHP_SELF']);
-			} else {
-				$lc = new LoginController();
-				$check = $lc->checkInput($_POST);
-				if ($check == "Passed check") {
-					$res = $lc->login($_POST);
-					if ($res === true) {
 
-					} else {
-						$message = $res;
-					}
-				} else {
-					$message = $check;
-				}
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$lc = new LoginController();
+			if (isset($_POST["LoginView::Logout"])) {
+				$message = $lc->logout();
+			} else if (!isset($_SESSION["loggedin"])) {
+				$message = $lc->checkInput($_POST);
+			} else {
+				$message = "";
 			}
 		} else if (isset($_SESSION["message"])) {
 			$message = $_SESSION["message"];
@@ -55,11 +45,14 @@ class LoginView extends FormView {
 		}
 
 		return $response;
+
 	}
 
 	/**
 	* Generate HTML code on the output buffer for the logout button
+	*
 	* @param $message, String output message
+	*
 	* @return  void, BUT writes to standard output!
 	*/
 	private function generateLogoutButtonHTML($message) {
@@ -73,7 +66,9 @@ class LoginView extends FormView {
 
 	/**
 	* Generate HTML code on the output buffer for the logout button
+	*
 	* @param $message, String output message
+	*
 	* @return  void, BUT writes to standard output!
 	*/
 	private function generateLoginFormHTML($message) {
