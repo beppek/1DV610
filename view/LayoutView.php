@@ -3,6 +3,11 @@
 
 class LayoutView {
 
+  /**
+   * Renders the view based on user interaction
+   *
+   * @param FormView $v - Abstract class. Use inheritance for call
+   */
   public function render($isLoggedIn, FormView $v, DateTimeView $dtv) {
     echo '<!DOCTYPE html>
       <html>

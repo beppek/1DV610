@@ -27,7 +27,7 @@ class LoginView extends FormView {
 			if (isset($_POST["LoginView::Logout"])) {
 				$message = $lc->logout();
 			} else if (!isset($_SESSION["loggedin"])) {
-				$message = $lc->checkInput($_POST);
+				$message = $lc->login($_POST);
 			} else {
 				$message = "";
 			}
@@ -99,11 +99,6 @@ class LoginView extends FormView {
 				</fieldset>
 			</form>
 		';
-	}
-
-	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
-	private function getRequestUserName() {
-		//RETURN REQUEST VARIABLE: USERNAME
 	}
 
 }

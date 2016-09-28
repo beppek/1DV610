@@ -11,7 +11,7 @@ class LoginController {
      *
      * @return Returns string if encounters errors otherwise chains the call to login.
      */
-    public function checkInput($formData) {
+    public function login($formData) {
 
         $username = $formData["LoginView::UserName"];
         $password = $formData["LoginView::Password"];
@@ -21,7 +21,7 @@ class LoginController {
         } else if (empty($password)) {
             return 'Password is missing';
         } else {
-            return $this->login($formData);
+            return $this->authenticate($formData);
         }
 
         return $message;
@@ -33,7 +33,7 @@ class LoginController {
      *
      * @return only returns string if login fails. Otherwise redirect
      */
-    public function login($user) {
+    public function authenticate($user) {
         $username = $user["LoginView::UserName"];
         $password = md5($user['LoginView::Password']);
 

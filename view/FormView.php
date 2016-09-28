@@ -5,6 +5,4 @@
  */
 abstract class FormView {
 
-
-
 }
