@@ -29,8 +29,8 @@ class Session {
         return false;
     }
 
-    function setLoggedIn() {
-
+    function setSessionVariable($name, $value) {
+        $_SESSION[$name] = $value;
     }
 
     function unsetSessionVariable($sessionVariable) {
@@ -44,28 +44,15 @@ class Session {
         return false;
     }
 
-    function setUserName() {
-
-    }
-
-    function getUserName() {
-
-    }
-
-    function setMessage() {
-
-    }
-
-    function getMessage() {
-
-    }
-
     function regenerateId() {
-
+        session_regenerate_id();
     }
 
-    function exists() {
-
+    function exists($name) {
+        if (isset($_SESSION[$name])) {
+            return true;
+        }
+        return false;
     }
 
     function destroy() {
