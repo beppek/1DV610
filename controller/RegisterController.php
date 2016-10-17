@@ -8,7 +8,7 @@ class RegisterController {
 
     /**
      * Check user input
-     * @return messages to display on the page
+     * @return array - messages to display on the page
      */
     public function registerUser($formData) {
 
@@ -35,7 +35,7 @@ class RegisterController {
 
     /**
      * Register user.
-     * @param $user should be the $_POST data
+     * @param $user - should be the $_POST data
      * @return array response from Database->createUser().
      */
     public function saveToDB($user) {

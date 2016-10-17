@@ -9,7 +9,7 @@ class LoginController {
     /**
      * Checks input.
      *
-     * @return Returns string if encounters errors otherwise chains the call to authenticate.
+     * @return string if encounters errors otherwise chains the call to authenticate.
      */
     public function login($formData) {
 
@@ -26,6 +26,7 @@ class LoginController {
             return $this->authenticate($formData);
         }
 
+        //TODO: Unreachable
         return $message;
 
     }
@@ -33,7 +34,8 @@ class LoginController {
     /**
      * Function to log user in.
      *
-     * @return only returns string if login fails. Otherwise redirect
+     * @return string if login fails. Otherwise redirect
+     * TODO: Fix return
      */
     public function authenticate($user) {
 
@@ -81,7 +83,8 @@ class LoginController {
     /**
      * Logout if user is logged in
      *
-     * @return return empty string if already logged out. Otherwise redirect
+     * @return string empty if already logged out. Otherwise redirect
+     * TODO: Fix return
      */
     public function logout() {
 

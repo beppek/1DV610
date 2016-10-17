@@ -8,8 +8,11 @@ class RegisterView extends FormView {
     private static $name = 'RegisterView::UserName';
     private static $password = 'RegisterView::Password';
     private static $passwordRepeat = 'RegisterView::PasswordRepeat';
+    //TODO: Do I need these?
+    //***
 	private static $cookieName = 'RegisterView::CookieName';
 	private static $cookiePassword = 'RegisterView::CookiePassword';
+    //***
     private static $messageId = 'RegisterView::Message';
 
     /**
@@ -67,19 +70,19 @@ class RegisterView extends FormView {
      * Render messages to display inside p element
      *
      * @param $messages - expects an array
+     * @return string - html output of messages
      */
     private function renderMessages($messages) {
 
-        //TODO: rename var
-        $str = '';
+        $htmlOutput = '';
         if (count($messages) == 0) {
-            return $str;
+            return $htmlOutput;
         } else {
             foreach($messages as $message) {
-                $str .= $message . '<br>';
+                $htmlOutput .= $message . '<br>';
             }
         }
-        return $str;
+        return $htmlOutput;
     }
 
 

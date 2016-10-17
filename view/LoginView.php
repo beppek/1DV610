@@ -8,8 +8,11 @@ class LoginView extends FormView {
 	private static $logout = 'LoginView::Logout';
 	private static $name = 'LoginView::UserName';
 	private static $password = 'LoginView::Password';
+    //TODO: DO I need these?
+    //***
 	private static $cookieName = 'LoginView::CookieName';
 	private static $cookiePassword = 'LoginView::CookiePassword';
+    //***
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
 
@@ -18,7 +21,7 @@ class LoginView extends FormView {
 	 *
 	 * Should be called after a login attempt has been determined
 	 *
-	 * @return  void BUT writes to standard output and cookies!
+	 * @return string -  html
 	 */
 	public function response() {
 

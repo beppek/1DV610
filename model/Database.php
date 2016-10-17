@@ -47,13 +47,13 @@ class Database {
             return false;
         }
 
+        //TODO: Unreachable
         $mysqli->close();
 
     }
 
     /**
      * Creates connection to MySQL server.
-     * @return true if successful connection
      */
     public function connect() {
 
@@ -66,9 +66,10 @@ class Database {
             exit();
         }
 
+        //TODO: Do I need this?
         $this->connected = true;
-        return $mysqli;
 
+        return $mysqli;
 
     }
 
@@ -77,6 +78,7 @@ class Database {
      */
     public function disconnect($mysqli) {
 
+        //TODO: Do I need this?
         if ($this->connected != false) {
             $mysqli->close();
             $this->connected = false;
@@ -87,7 +89,8 @@ class Database {
     /**
      * Create user table in database if not exists
      * Only call from constructor
-     * @return if error creating table return
+     * @return string - only if error creating table
+     * TODO: Fix return
      */
     private function createUserTable() {
 
@@ -115,7 +118,8 @@ class Database {
     /**
      * Create cookie table in database if not exists
      * Only call from constructor
-     * @return if error creating table return
+     * @return string - only if error creating table return
+     * TODO: Fix return
      */
     private function createCookieTable() {
 
@@ -142,7 +146,8 @@ class Database {
 
     /**
      * Create user in database
-     * @return text string with information on the result
+     * @return string with information on the result
+     * TODO: Better return
      */
     public function createUser($username, $password) {
 
@@ -164,6 +169,7 @@ class Database {
             return $mysqli->error;
         }
 
+        //TODO: Unreachable
         $this->disconnect($mysqli);
 
     }
@@ -196,6 +202,8 @@ class Database {
             $result->close();
         }
         $this->disconnect($mysqli);
+
+        return false;
     }
 
     /**
@@ -228,6 +236,8 @@ class Database {
         }
         $this->disconnect($mysqli);
 
+        return false;
+
     }
 
     /**
@@ -247,6 +257,7 @@ class Database {
             return $mysqli->error;
         }
 
+        //TODO: Unreachable
         $this->disconnect($mysqli);
 
     }
@@ -281,6 +292,8 @@ class Database {
 
         }
         $this->disconnect($mysqli);
+
+        return false;
     }
 
 }
