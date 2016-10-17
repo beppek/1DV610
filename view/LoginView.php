@@ -10,8 +10,8 @@ class LoginView extends FormView {
 	private static $password = 'LoginView::Password';
     //TODO: DO I need these?
     //***
-	private static $cookieName = 'LoginView::CookieName';
-	private static $cookiePassword = 'LoginView::CookiePassword';
+	//private static $cookieName = 'LoginView::CookieName';
+	//private static $cookiePassword = 'LoginView::CookiePassword';
     //***
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';

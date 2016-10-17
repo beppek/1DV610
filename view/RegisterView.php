@@ -10,8 +10,8 @@ class RegisterView extends FormView {
     private static $passwordRepeat = 'RegisterView::PasswordRepeat';
     //TODO: Do I need these?
     //***
-	private static $cookieName = 'RegisterView::CookieName';
-	private static $cookiePassword = 'RegisterView::CookiePassword';
+	//private static $cookieName = 'RegisterView::CookieName';
+	//private static $cookiePassword = 'RegisterView::CookiePassword';
     //***
     private static $messageId = 'RegisterView::Message';
 

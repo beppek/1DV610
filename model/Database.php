@@ -21,7 +21,7 @@ class Database {
         $this->db_name = $secrets->db_name;
         $this->db_user = $secrets->db_user;
         $this->db_pass = $secrets->db_pass;
-        $this->db_host = "localhost";
+        $this->db_host = $secrets->db_host;
 
         $this->createDatabase();
         $this->createUserTable();
