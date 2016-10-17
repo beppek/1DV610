@@ -17,6 +17,7 @@ class Database {
     public function __construct() {
         $secrets = new Secrets();
 
+        //TODO: Include host in secrets file
         $this->db_name = $secrets->db_name;
         $this->db_user = $secrets->db_user;
         $this->db_pass = $secrets->db_pass;
@@ -32,6 +33,8 @@ class Database {
      * Only call from constructor
      */
     private function createDatabase() {
+
+        //TODO: Use connect method
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass);
         if ($mysqli->connect_error) {
             die("Connection failed: " . $mysqli->connect_error);
@@ -54,6 +57,7 @@ class Database {
      */
     public function connect() {
 
+        //TODO: Rewrite method to be able to use from constructor
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
 
         if ($mysqli->connect_errno) {
@@ -96,6 +100,8 @@ class Database {
         reg_date TIMESTAMP
         )";
 
+        //TODO: Rewrite to remove empty if statement
+        //TODO: Break out to query method
         if ($mysqli->query($sql) === TRUE) {
 
         } else {
@@ -122,6 +128,8 @@ class Database {
         reg_date TIMESTAMP
         )";
 
+        //TODO: Rewrite to remove empty if statement
+        //TODO: Break out to query method
         if ($mysqli->query($sql) === TRUE) {
 
         } else {
@@ -149,6 +157,7 @@ class Database {
         $sql = "INSERT INTO users (username, password)
         VALUES ('$username', '$hashedPassword')";
 
+        //TODO: Break out to query method
         if ($mysqli->query($sql) === TRUE) {
            return "Registered new user.";
         } else {
@@ -167,9 +176,11 @@ class Database {
 
         $mysqli = $this->connect();
 
+        //TODO: Can I break out  to query method?
         if ($result = $mysqli->query("SELECT * FROM users")) {
             if ($result->num_rows > 0) {
 
+                //TODO: Rename vars $rows[] -> $users[] and $row -> $user
                 while($row = $result->fetch_array()) {
                     $rows[] = $row;
                 }
@@ -195,9 +206,11 @@ class Database {
 
         $mysqli = $this->connect();
 
+        //TODO: Query method?
         if ($result = $mysqli->query("SELECT * FROM users")) {
             if ($result->num_rows > 0) {
 
+                //TODO: REname vars
                 while($row = $result->fetch_array()) {
                     $rows[] = $row;
                 }
@@ -227,6 +240,7 @@ class Database {
         $sql = "INSERT INTO cookies (cookiename, password)
         VALUES ('$name', '$password')";
 
+        //TODO: Query method
         if ($mysqli->query($sql) === TRUE) {
             return true;
         } else {
@@ -246,6 +260,7 @@ class Database {
 
         $mysqli = $this->connect();
 
+        //TODO: Query method
         if ($result = $mysqli->query("SELECT * FROM cookies")) {
             if ($result->num_rows > 0) {
 

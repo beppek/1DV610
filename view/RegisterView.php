@@ -18,6 +18,8 @@ class RegisterView extends FormView {
      * Call if url param is ?register
      */
      public function response() {
+
+         //TODO: Break out to helper method/class
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $rc = new RegisterController();
             $messages = $rc->registerUser($_POST);
@@ -29,11 +31,14 @@ class RegisterView extends FormView {
      }
 
      private function generateRegisterFormHTML($messages) {
+
+         //TODO: Break out to helper method
          if (isset($_POST['RegisterView::UserName'])) {
 			$username = strip_tags($_POST['RegisterView::UserName']);
 		} else {
 			$username = '';
 		}
+
 		return '
             <h2>Register new user</h2>
 			<form method="post" action="?register">
@@ -64,6 +69,8 @@ class RegisterView extends FormView {
      * @param $messages - expects an array
      */
     private function renderMessages($messages) {
+
+        //TODO: rename var
         $str = '';
         if (count($messages) == 0) {
             return $str;

@@ -13,9 +13,11 @@ class LoginController {
      */
     public function login($formData) {
 
+        //TODO: Change $formData arg to only include what is needed and not using strings
         $username = $formData["LoginView::UserName"];
         $password = $formData["LoginView::Password"];
 
+        //TODO: isEmpty helper method
         if (empty($username)) {
             return 'Username is missing';
         } else if (empty($password)) {
@@ -34,9 +36,12 @@ class LoginController {
      * @return only returns string if login fails. Otherwise redirect
      */
     public function authenticate($user) {
+
+        //TODO: With better arg to login method string dependency is gone
         $username = $user["LoginView::UserName"];
         $password = $user['LoginView::Password'];
 
+        //TODO: helper method
         if (isset($user["LoginView::KeepMeLoggedIn"]) && $user["LoginView::KeepMeLoggedIn"] === "on") {
             $keep = true;
         } else {
@@ -45,10 +50,11 @@ class LoginController {
 
         $this->db = new Database();
 
+
         if ($this->db->authenticateUser($username, $password)) {
             $_SESSION["username"] = $username;
-            // $_SESSION["password"] = $password;
 
+            //TODO: Helper method
             if ($keep) {
                 $cookiePassword = md5(uniqid('', true));
                 $this->db->storeCookie($username, $cookiePassword);
@@ -60,8 +66,11 @@ class LoginController {
                 $_SESSION["message"] = "Welcome";
             }
 
+            //TODO: Session controller class
             $_SESSION["loggedin"] = true;
             session_regenerate_id();
+
+            //TODO: Redirect controller
             return header("Location: " . $_SERVER['PHP_SELF']);
        } else {
             return "Wrong name or password";
@@ -75,16 +84,21 @@ class LoginController {
      * @return return empty string if already logged out. Otherwise redirect
      */
     public function logout() {
+
+        //TODO: Cookie controller
         if (isset($_COOKIE["username"])) {
             setcookie("LoginView::CookieName", "", time() - 3600);
             setcookie("LoginView::CookiePassword", "", time() - 3600);
         }
+
+        //TODO: Session controller
         if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             unset($_SESSION["username"]);
-            // unset($_SESSION["password"]);
             unset($_SESSION["loggedin"]);
             $_SESSION["message"] = "Bye bye!";
             session_regenerate_id();
+
+            //TODO: Redirect controller
             return header("Location: " . $_SERVER['PHP_SELF']);
         } else {
             $message = "";

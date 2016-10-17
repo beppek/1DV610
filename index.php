@@ -7,13 +7,17 @@ require_once('view/LayoutView.php');
 require_once('view/RegisterView.php');
 require_once('model/Database.php');
 
+//TODO: Turn off for final submission
 //MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
+//TODO: Break out to session settings class
 ini_set( 'session.use_trans_sid', false );
 ini_set( 'session.cookie_httponly', true );
 ini_set( 'session.use_only_cookies', true );
+
+session_start();
 
 //CREATE OBJECTS OF THE VIEWS
 $v = new LoginView();
@@ -21,8 +25,7 @@ $dtv = new DateTimeView();
 $lv = new LayoutView();
 $rv = new RegisterView();
 
-session_start();
-
+//TODO: break out to helper class/Session controller
 if (isset($_SESSION['HTTP_USER_AGENT'])) {
      if ($_SESSION['HTTP_USER_AGENT'] != md5($_SERVER['HTTP_USER_AGENT'])) {
          $lv->render(false, $v, $dtv);
@@ -32,6 +35,7 @@ if (isset($_SESSION['HTTP_USER_AGENT'])) {
     $_SESSION['HTTP_USER_AGENT'] = md5($_SERVER['HTTP_USER_AGENT']);
 }
 
+//TODO: Break out to helper class
 if (isset($_GET['register'])) {
     $lv->render(false, $rv, $dtv);
 } else if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true ) {

@@ -22,6 +22,7 @@ class LoginView extends FormView {
 	 */
 	public function response() {
 
+		//TODO: Break out to helper class/method
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$lc = new LoginController();
 			if (isset($_POST['LoginView::Logout'])) {
@@ -38,6 +39,7 @@ class LoginView extends FormView {
 			$message = '';
 		}
 
+		//TODO: Break out to helper class/method
 		if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
 			$response = $this->generateLogoutButtonHTML($message);
 		} else {
@@ -72,6 +74,7 @@ class LoginView extends FormView {
 	*/
 	private function generateLoginFormHTML($message) {
 
+		//TODO: Break out to helper method/Session controller class
 		if (isset($_POST['LoginView::UserName'])) {
 			$username = $_POST['LoginView::UserName'];
 		} else if (isset($_SESSION['username'])) {
@@ -80,6 +83,7 @@ class LoginView extends FormView {
 		} else {
 			$username = '';
 		}
+
 		return '
 			<form method="post">
 				<fieldset>
