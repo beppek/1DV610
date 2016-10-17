@@ -26,9 +26,6 @@ class LoginController {
             return $this->authenticate($formData);
         }
 
-        //TODO: Unreachable
-        return $message;
-
     }
 
     /**

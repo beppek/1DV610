@@ -9,7 +9,7 @@ class LayoutView {
    *
    * @param FormView $v - Abstract class. Use inheritance for call
    */
-  public function render(FormView $v, DateTimeView $dtv) {
+  public function render($isLoggedIn, FormView $v, DateTimeView $dtv) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -18,7 +18,7 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 2</h1>
-          ' . $this->renderIsLoggedIn() . '
+          ' . $this->renderIsLoggedIn($isLoggedIn) . '
 
           <div class="container">
               ' . $v->response() . '
@@ -30,9 +30,8 @@ class LayoutView {
     ';
   }
 
-  private function renderIsLoggedIn() {
-    $session = new Session();
-    if ($session->isLoggedIn()) {
+  private function renderIsLoggedIn($isLoggedIn) {
+    if ($isLoggedIn) {
       return '<h2>Logged in</h2>';
     }
     else {

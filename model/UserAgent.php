@@ -2,10 +2,8 @@
 
 class UserAgent {
 
-    private $incomingUserAgent;
-
     public function __construct() {
-        $this->incomingUserAgent = md5($_SERVER['HTTP_USER_AGENT']);
+        $this->set();
     }
 
     public function exists() {
@@ -17,7 +15,7 @@ class UserAgent {
     }
 
     public function isSame() {
-        if ($_SESSION['HTTP_USER_AGENT'] == $this->incomingUserAgent) {
+        if ($_SESSION['HTTP_USER_AGENT'] == md5($_SERVER['HTTP_USER_AGENT'])) {
             return true;
         }
         return false;
@@ -25,7 +23,7 @@ class UserAgent {
 
     public function set() {
         if (!$this->exists()) {
-            $_SESSION['HTTP_USER_AGENT'] = $this->incomingUserAgent;
+            $_SESSION['HTTP_USER_AGENT'] = md5($_SERVER['HTTP_USER_AGENT']);
         }
     }
 }

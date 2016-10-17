@@ -5,8 +5,6 @@ require_once('model/UserAgent.php');
 class Session {
 
     private $userAgent;
-    private $isLoggedIn;
-    private $message;
 
     function __construct() {
 
@@ -25,13 +23,9 @@ class Session {
     }
 
     function isHijacked() {
-        if ($this->userAgent->exists()) {
-            if ($this->userAgent->isSame()) {
-                return false;
-            }
+        if (!$this->userAgent->isSame()) {
             return true;
         }
-        $this->userAgent->set();
         return false;
     }
 
@@ -39,8 +33,8 @@ class Session {
 
     }
 
-    function unsetLoggedIn() {
-
+    function unsetSessionVariable($sessionVariable) {
+        unset($_SESSION[$sessionVariable]);
     }
 
     function isLoggedIn() {
@@ -66,16 +60,16 @@ class Session {
 
     }
 
-    function unsetMessage() {
-
-    }
-
     function regenerateId() {
 
     }
 
     function exists() {
 
+    }
+
+    function destroy() {
+        session_destroy();
     }
 
 }
