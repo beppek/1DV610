@@ -2,11 +2,16 @@
 
 class Cookie {
 
-    function __construct() {
+    public function set($cookieName, $cookieValue) {
 
     }
 
-    function setCookie($cookieName, $cookieValue) {
+    public function unset($cookieName, $cookieValue) {
 
     }
+
+    public function exists($cookieName) {
+
+    }
+
 }

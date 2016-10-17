@@ -5,10 +5,13 @@ require_once('model/UserAgent.php');
 class Session {
 
     private $userAgent;
+    private $isLoggedIn;
+    private $message;
 
     function __construct() {
 
         $this->startSession();
+        $this->userAgent = new UserAgent();
 
     }
 
@@ -18,15 +21,18 @@ class Session {
             ini_set( 'session.cookie_httponly', true );
             ini_set( 'session.use_only_cookies', true );
             session_start();
-            $this->userAgent = new UserAgent();
         }
     }
 
     function isHijacked() {
-        if ($this->userAgent->isSame()) {
-            return false;
+        if ($this->userAgent->exists()) {
+            if ($this->userAgent->isSame()) {
+                return false;
+            }
+            return true;
         }
-        return true;
+        $this->userAgent->set();
+        return false;
     }
 
     function setLoggedIn() {
@@ -60,7 +66,15 @@ class Session {
 
     }
 
+    function unsetMessage() {
+
+    }
+
     function regenerateId() {
+
+    }
+
+    function exists() {
 
     }
 
