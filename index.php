@@ -7,7 +7,6 @@ require_once('view/LayoutView.php');
 require_once('view/RegisterView.php');
 require_once('model/Database.php');
 require_once('model/Session.php');
-require_once('controller/SessionController.php');
 
 //TODO: Turn off for final submission
 //MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
@@ -22,15 +21,15 @@ $rv = new RegisterView();
 
 $session = new Session();
 if ($session->isHijacked()) {
-    $lv->render(false, $v, $dtv);
+    $lv->render($v, $dtv);
     exit;
 }
 
 //TODO: Break out to helper class
 if (isset($_GET['register'])) {
-    $lv->render(false, $rv, $dtv);
-} else if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true ) {
-    $lv->render(true, $v, $dtv);
+    $lv->render($rv, $dtv);
+} else if ($session->isLoggedIn()) {
+    $lv->render($v, $dtv);
 } else if (isset($_COOKIE['LoginView::CookieName'])) {
     $db = new Database();
     $name = $_COOKIE['LoginView::CookieName'];
@@ -38,13 +37,13 @@ if (isset($_GET['register'])) {
     if ($db->verifyCookie($name, $password)) {
         $_SESSION['message'] = 'Welcome back with cookie';
         $_SESSION['loggedin'] = true;
-        $lv->render(true, $v, $dtv);
+        $lv->render($v, $dtv);
     } else {
         setcookie('LoginView::CookieName', '', time() - 3600);
         setcookie('LoginView::CookiePassword', '', time() - 3600);
         $_SESSION['message'] = 'Wrong information in cookies';
-        $lv->render(false, $v, $dtv);
+        $lv->render($v, $dtv);
     }
 } else {
-    $lv->render(false, $v, $dtv);
+    $lv->render($v, $dtv);
 }

@@ -1,5 +1,6 @@
 <?php
 
+require_once('model/Session.php');
 
 class LayoutView {
 
@@ -8,7 +9,7 @@ class LayoutView {
    *
    * @param FormView $v - Abstract class. Use inheritance for call
    */
-  public function render($isLoggedIn, FormView $v, DateTimeView $dtv) {
+  public function render(FormView $v, DateTimeView $dtv) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -17,7 +18,7 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 2</h1>
-          ' . $this->renderIsLoggedIn($isLoggedIn) . '
+          ' . $this->renderIsLoggedIn() . '
 
           <div class="container">
               ' . $v->response() . '
@@ -29,8 +30,9 @@ class LayoutView {
     ';
   }
 
-  private function renderIsLoggedIn($isLoggedIn) {
-    if ($isLoggedIn) {
+  private function renderIsLoggedIn() {
+    $session = new Session();
+    if ($session->isLoggedIn()) {
       return '<h2>Logged in</h2>';
     }
     else {
