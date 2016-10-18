@@ -9,11 +9,20 @@ class Cookie {
 
     public function unset($cookieName) {
         $expiredDate = time() - 3600;
-        setcookie($cookieName, "", $expiredDate);
+        setcookie($cookieName, '', $expiredDate);
     }
 
     public function exists($cookieName) {
+        if (isset($_COOKIE[$cookieName])) {
+            return true;
+        }
+        return false;
+    }
 
+    public function getValue($cookieName) {
+        if ($this->exists($cookieName)) {
+            return $_COOKIE[$cookieName];
+        }
     }
 
 }

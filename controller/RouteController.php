@@ -11,14 +11,18 @@ require_once('model/Cookie.php');
 
 class RouteController {
 
+    private static $cookieUsername = 'LoginView::CookieName';
+    private static $cookiePassword = 'LoginView::CookiePassword';
+
     private $loginView;
     private $dateTimeView;
     private $layoutView;
     private $registerView;
 
     private $session;
+    private $cookie;
 
-    function __construct() {
+    public function __construct() {
 
         $this->loginView = new LoginView();
         $this->dateTimeView = new DateTimeView();
@@ -26,43 +30,81 @@ class RouteController {
         $this->registerView = new RegisterView();
 
         $this->session = new Session();
+        $this->cookie = new Cookie();
 
     }
 
-    function route() {
+    public function route() {
 
-        try {
-            $this->preventSessionHijacking();
-        } catch (Exception $e) {
-            return $this->layoutView->render(false, $this->loginView, $this->dateTimeView);
-        }
-        if (isset($_GET['register'])) {
-            $this->layoutView->render(false, $this->registerView, $this->dateTimeView);
-        } else if ($this->session->isLoggedIn()) {
-            $this->layoutView->render(true, $this->loginView, $this->dateTimeView);
-        } else if (isset($_COOKIE['LoginView::CookieName'])) {
-            $db = new Database();
-            $name = $_COOKIE['LoginView::CookieName'];
-            $password = $_COOKIE['LoginView::CookiePassword'];
-            if ($db->verifyCookie($name, $password)) {
-                $_SESSION['message'] = 'Welcome back with cookie';
-                $_SESSION['loggedin'] = true;
-                $this->layoutView->render(true, $this->loginView, $this->dateTimeView);
-            } else {
-                setcookie('LoginView::CookieName', '', time() - 3600);
-                setcookie('LoginView::CookiePassword', '', time() - 3600);
-                $_SESSION['message'] = 'Wrong information in cookies';
-                $this->layoutView->render(false, $this->loginView, $this->dateTimeView);
-            }
+        if ($this->session->isLoggedIn()) {
+            $this->checkSession();
+        } else if ($this->urlParamIsRegister()) {
+            $this->gotoRegisterPage();
+        } else if ($this->cookie->exists(self::$cookieUsername)) {
+            $this->loginWithCookie();
         } else {
-            $this->layoutView->render(false, $this->loginView, $this->dateTimeView);
+            $isLoggedIn = false;
+            $this->gotoLoginPage($isLoggedIn);
         }
+
 
     }
 
-    function preventSessionHijacking() {
+    private function checkSession() {
+        $isLoggedIn = true;
         if ($this->session->isHijacked()) {
-            throw new Exception("Session is hijacked");
+            $isLoggedIn = false;
         }
+        $this->gotoLoginPage($isLoggedIn);
+    }
+
+    public function gotoRegisterPage() {
+        $isLoggedIn = false;
+        $this->layoutView->render($isLoggedIn, $this->registerView, $this->dateTimeView);
+    }
+
+    public function gotoLoginPage($isLoggedIn) {
+        $this->layoutView->render($isLoggedIn, $this->loginView, $this->dateTimeView);
+    }
+
+    public function urlParamIsRegister() {
+        if (isset($_GET['register'])) {
+            return true;
+        }
+        return false;
+    }
+
+    public function loginWithCookie() {
+
+        $db = new Database();
+        $name = $this->cookie->getValue(self::$cookieUsername);
+        $password = $this->cookie->getValue(self::$cookiePassword);
+
+        $sessionMessage = 'message';
+        $sessionLoggedIn = 'loggedin';
+
+        $isLoggedIn;
+
+        if ($db->verifyCookie($name, $password)) {
+
+            $successMessage = 'Welcome back with cookie';
+
+            $this->session->setSessionVariable($sessionMessage, $successMessage);
+            $this->session->setSessionVariable($sessionLoggedIn, true);
+            $isLoggedIn = true;
+
+        } else {
+
+            $wrongCookieInfoMessage = 'Wrong information in cookies';
+
+            $this->cookie->unset(self::$cookieUsername);
+            $this->cookie->unset(self::$cookiePassword);
+            $this->session->setSessionVariable($sessionMessage, $wrongCookieInfoMessage);
+            $isLoggedIn = false;
+
+        }
+
+        $this->gotoLoginPage($isLoggedIn);
+
     }
 }
