@@ -96,8 +96,8 @@ class RouteController {
 
             $wrongCookieInfoMessage = 'Wrong information in cookies';
 
-            $this->cookie->unset(self::$cookieUsername);
-            $this->cookie->unset(self::$cookiePassword);
+            $this->cookie->delete(self::$cookieUsername);
+            $this->cookie->delete(self::$cookiePassword);
             $this->session->setSessionVariable($sessionMessage, $wrongCookieInfoMessage);
             $isLoggedIn = false;
 

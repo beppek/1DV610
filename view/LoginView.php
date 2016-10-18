@@ -20,7 +20,7 @@ class LoginView extends FormView {
 	 *
 	 * Should be called after a login attempt has been determined
 	 *
-	 * @return string -  html
+	 * @return string - generated html
 	 */
 	public function response() {
 
@@ -45,7 +45,7 @@ class LoginView extends FormView {
 	*
 	* @param $message, String output message
 	*
-	* @return  void, BUT writes to standard output!
+	* @return void, BUT writes to standard output!
 	*/
 	private function generateLogoutButtonHTML($message) {
 		return '
@@ -61,7 +61,7 @@ class LoginView extends FormView {
 	*
 	* @param $message, String output message
 	*
-	* @return  void, BUT writes to standard output!
+	* @return void, BUT writes to standard output!
 	*/
 	private function generateLoginFormHTML($message) {
 

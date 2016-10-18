@@ -7,7 +7,7 @@ class Cookie {
         setcookie($cookieName, $cookieValue, $cookieEndDate);
     }
 
-    public function unset($cookieName) {
+    public function delete($cookieName) {
         if ($this->exists($cookieName)) {
             $expiredDate = time() - 3600;
             setcookie($cookieName, '', $expiredDate);

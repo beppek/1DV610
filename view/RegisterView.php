@@ -22,21 +22,18 @@ class RegisterView extends FormView {
      */
      public function response() {
 
-         //TODO: Break out to helper method/class
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $rc = new RegisterController();
-            $messages = $rc->registerUser($_POST);
-		} else {
-			$messages = [];
-		}
-         $response = $this->generateRegisterFormHTML($messages);
-         return $response;
+        $rc = new RegisterController();
+        $rc->handleRequest();
+        $messages = $rc->getMessages();
+
+        $response = $this->generateRegisterFormHTML($messages);
+        return $response;
      }
 
      private function generateRegisterFormHTML($messages) {
 
-         //TODO: Break out to helper method
-         if (isset($_POST['RegisterView::UserName'])) {
+        //TODO: Break out to helper method
+        if (isset($_POST['RegisterView::UserName'])) {
 			$username = strip_tags($_POST['RegisterView::UserName']);
 		} else {
 			$username = '';

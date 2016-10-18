@@ -1,7 +1,7 @@
 <?php
 
 require_once('model/Database.php');
-require_once('model/Server.php');
+require_once('controller/ServerController.php');
 require_once('model/Session.php');
 require_once('model/PostData.php');
 require_once('model/Cookie.php');
@@ -30,7 +30,7 @@ class LoginController {
     private $password;
 
     public function __construct() {
-        $this->server = new Server();
+        $this->server = new ServerController();
         $this->session = new Session();
         $this->cookie = new Cookie();
     }
@@ -50,7 +50,6 @@ class LoginController {
 
     public function handleUserData() {
         $this->post = new PostData();
-        $userData = $this->post->getPostData();
         $this->username = $this->post->getPostDataVariable(self::$formUsername);
         $this->password = $this->post->getPostDataVariable(self::$formPassword);
 
@@ -94,7 +93,7 @@ class LoginController {
             $this->session->setSessionVariable(self::$sessionLoggedIn, true);
             $this->session->regenerateId();
 
-            header('Location: ' . $_SERVER['PHP_SELF']);
+            $this->server->redirectToSelf();
        } else {
             $failedLoginMessage = 'Wrong name or password';
             $this->message = $failedLoginMessage;
@@ -128,8 +127,8 @@ class LoginController {
 
     public function logout() {
 
-        $this->cookie->unset(self::$cookieName);
-        $this->cookie->unset(self::$cookiePassword);
+        $this->cookie->delete(self::$cookieName);
+        $this->cookie->delete(self::$cookiePassword);
 
         if ($this->session->isLoggedIn()) {
 
@@ -139,7 +138,7 @@ class LoginController {
             $this->session->setSessionVariable(self::$sessionMessage, 'Bye bye!');
             $this->session->regenerateId();
 
-            header('Location: ' . $_SERVER['PHP_SELF']);
+            $this->server->redirectToSelf();
         } else {
             $this->message = '';
         }
