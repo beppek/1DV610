@@ -8,8 +8,10 @@ class Cookie {
     }
 
     public function unset($cookieName) {
-        $expiredDate = time() - 3600;
-        setcookie($cookieName, '', $expiredDate);
+        if ($this->exists($cookieName)) {
+            $expiredDate = time() - 3600;
+            setcookie($cookieName, '', $expiredDate);
+        }
     }
 
     public function exists($cookieName) {

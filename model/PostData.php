@@ -14,6 +14,8 @@ class PostData {
     }
 
     public function getPostDataVariable($postVariable) {
-        return $_POST[$postVariable];
+        if ($this->postVariableisSet($postVariable)) {
+            return $_POST[$postVariable];
+        }
     }
 }
