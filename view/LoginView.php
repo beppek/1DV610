@@ -3,6 +3,7 @@
 require_once('controller/LoginController.php');
 require_once('view/FormView.php');
 require_once('model/Session.php');
+require_once('model/PostData.php');
 
 class LoginView extends FormView {
 	private static $login = 'LoginView::Login';
@@ -64,15 +65,7 @@ class LoginView extends FormView {
 	*/
 	private function generateLoginFormHTML($message) {
 
-		//TODO: Break out to helper method/Session controller class
-		if (isset($_POST['LoginView::UserName'])) {
-			$username = $_POST['LoginView::UserName'];
-		} else if (isset($_SESSION['username'])) {
-			$username = $_SESSION['username'];
-			unset($_SESSION['username']);
-		} else {
-			$username = '';
-		}
+		$username = $this->getUsername();
 
 		return '
 			<form method="post">
@@ -93,6 +86,22 @@ class LoginView extends FormView {
 				</fieldset>
 			</form>
 		';
+	}
+
+	private function getUsername() {
+		$username;
+		$post = new PostData();
+		$sessionUsername = 'username';
+
+		if ($post->postVariableisSet(self::$name)) {
+			$username = $post->getPostDataVariable(self::$name);
+		} else if ($this->session->exists($sessionUsername)) {
+			$username = $this->session->getSessionVariable($sessionUsername);
+			$this->session->unsetSessionVariable($sessionUsername);
+		} else {
+			$username = '';
+		}
+
 	}
 
 }
