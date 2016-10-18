@@ -37,7 +37,7 @@ class RouteController {
     public function route() {
 
         if ($this->session->isLoggedIn()) {
-            $this->checkSession();
+            $this->loginWithSession();
         } else if ($this->urlParamIsRegister()) {
             $this->gotoRegisterPage();
         } else if ($this->cookie->exists(self::$cookieUsername)) {
@@ -50,17 +50,13 @@ class RouteController {
 
     }
 
-    private function checkSession() {
-        $isLoggedIn = true;
+    private function loginWithSession() {
         if ($this->session->isHijacked()) {
             $isLoggedIn = false;
+        } else {
+            $isLoggedIn = true;
         }
         $this->gotoLoginPage($isLoggedIn);
-    }
-
-    public function gotoRegisterPage() {
-        $isLoggedIn = false;
-        $this->layoutView->render($isLoggedIn, $this->registerView, $this->dateTimeView);
     }
 
     public function gotoLoginPage($isLoggedIn) {
@@ -72,6 +68,11 @@ class RouteController {
             return true;
         }
         return false;
+    }
+
+    public function gotoRegisterPage() {
+        $isLoggedIn = false;
+        $this->layoutView->render($isLoggedIn, $this->registerView, $this->dateTimeView);
     }
 
     public function loginWithCookie() {
