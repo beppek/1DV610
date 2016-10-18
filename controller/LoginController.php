@@ -1,17 +1,58 @@
 <?php
 
-require_once("model/Database.php");
+require_once('model/Database.php');
+require_once('model/Server.php');
+require_once('model/Session.php');
+require_once('model/PostData.php');
 
 class LoginController {
 
-    private $db;
+    private static $sessionMessage = 'message';
+    private static $logout = 'LoginView::Logout';
+    private static $sessionLoggedIn = 'loggedin';
 
-    /**
-     * Checks input.
-     *
-     * @return string if encounters errors otherwise chains the call to authenticate.
-     */
-    public function login($formData) {
+    private $db;
+    private $message;
+    private $server;
+    private $session;
+    private $postData;
+
+    public function __construct() {
+        $this->server = new Server();
+        $this->session = new Session();
+    }
+
+    public function handleRequest() {
+
+		if ($this->server->requestMethodIsPost()) {
+			$this->handlePostData();
+		} else if ($this->session->exists(self::$sessionMessage)) {
+			$this->message = $this->session->getSessionVariable(self::$sessionMessage);
+			$this->session->unsetSessionVariable(self::$sessionMessage);
+		} else {
+			$this->message = '';
+		}
+
+    }
+
+    public function handlePostData() {
+        $this->postData = new PostData();
+
+        if ($this->postData->postVariableIsSet(self::$logout)) {
+            $this->logout();
+        } else if (!$this->session->isLoggedIn()) {
+            $this->login();
+        } else {
+            $this->message = '';
+        }
+
+    }
+
+    public function getMessage() {
+        return $this->message;
+    }
+
+    public function login() {
 
         //TODO: Change $formData arg to only include what is needed and not using strings
         $username = $formData["LoginView::UserName"];
@@ -19,18 +60,16 @@ class LoginController {
 
         //TODO: isEmpty helper method
         if (empty($username)) {
-            return 'Username is missing';
+            $this->message = 'Username is missing';
         } else if (empty($password)) {
-            return 'Password is missing';
+            $this->message = 'Password is missing';
         } else {
-            return $this->authenticate($formData);
+            $this->authenticate($formData);
         }
 
     }
 
     /**
-     * Function to log user in.
-     *
      * @return string if login fails. Otherwise redirect
      * TODO: Fix return
      */
@@ -72,14 +111,12 @@ class LoginController {
             //TODO: Redirect controller
             return header("Location: " . $_SERVER['PHP_SELF']);
        } else {
-            return "Wrong name or password";
+            $this->message = "Wrong name or password";
        }
 
     }
 
     /**
-     * Logout if user is logged in
-     *
      * @return string empty if already logged out. Otherwise redirect
      * TODO: Fix return
      */
@@ -101,9 +138,8 @@ class LoginController {
             //TODO: Redirect controller
             return header("Location: " . $_SERVER['PHP_SELF']);
         } else {
-            $message = "";
+            $this->message = "";
         }
-        return $message;
     }
 
 }

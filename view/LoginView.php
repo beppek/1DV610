@@ -17,6 +17,8 @@ class LoginView extends FormView {
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
 
+	private $session;
+
 	/**
 	 * Create HTTP response
 	 *
@@ -26,25 +28,14 @@ class LoginView extends FormView {
 	 */
 	public function response() {
 
-		//TODO: Break out to helper class/method
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			$lc = new LoginController();
-			if (isset($_POST['LoginView::Logout'])) {
-				$message = $lc->logout();
-			} else if (!isset($_SESSION['loggedin'])) {
-				$message = $lc->login($_POST);
-			} else {
-				$message = '';
-			}
-		} else if (isset($_SESSION['message'])) {
-			$message = $_SESSION['message'];
-			unset($_SESSION['message']);
-		} else {
-			$message = '';
-		}
+		$this->session = new Session();
+		$lc = new LoginController();
 
-		//TODO: Break out to helper class/method
-		if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+		$lc->handleRequest();
+
+		$message = $lc->getMessage();
+
+		if ($this->session->isLoggedIn()) {
 			$response = $this->generateLogoutButtonHTML($message);
 		} else {
 			$response = $this->generateLoginFormHTML($message);

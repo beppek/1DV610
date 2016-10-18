@@ -1,6 +1,5 @@
 <?php
 
-//INCLUDE THE FILES NEEDED...
 require_once('view/LoginView.php');
 require_once('view/DateTimeView.php');
 require_once('view/LayoutView.php');
@@ -46,7 +45,6 @@ class RouteController {
             $isLoggedIn = false;
             $this->gotoLoginPage($isLoggedIn);
         }
-
 
     }
 
@@ -108,4 +106,5 @@ class RouteController {
         $this->gotoLoginPage($isLoggedIn);
 
     }
+
 }

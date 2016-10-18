@@ -37,6 +37,10 @@ class Session {
         unset($_SESSION[$sessionVariable]);
     }
 
+    function getSessionVariable($sessionVariable) {
+        return $_SESSION[$sessionVariable];
+    }
+
     function isLoggedIn() {
         if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true ) {
             return true;
