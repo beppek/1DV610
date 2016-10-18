@@ -102,6 +102,7 @@ class LoginView extends FormView {
 			$username = '';
 		}
 
+		return $username;
 	}
 
 }
