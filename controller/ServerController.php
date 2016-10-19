@@ -9,13 +9,14 @@ class ServerController {
     private static $phpSelf = 'PHP_SELF';
     private static $location = 'Location: ';
     private static $register = 'register';
+    private static $post = 'POST';
 
     public function requestMethod() {
         return $_SERVER[self::$requestMethod];
     }
 
     public function requestMethodIsPost() {
-        if ($this->requestMethod() == 'POST') {
+        if ($this->requestMethod() == self::$post) {
             return true;
         }
         return false;
