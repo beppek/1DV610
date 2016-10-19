@@ -5,6 +5,7 @@ require_once('controller/ServerController.php');
 require_once('model/Session.php');
 require_once('model/PostData.php');
 require_once('model/Cookie.php');
+require_once('controller/FormValidator.php');
 
 class RegisterController {
 
@@ -43,11 +44,7 @@ class RegisterController {
         return $this->messages;
     }
 
-    /**
-     * Check user input
-     * @return array - messages to display on the page
-     */
-    public function registerUser() {
+    private function registerUser() {
 
         $this->post = new PostData();
 
@@ -55,21 +52,16 @@ class RegisterController {
         $this->password = $this->post->getPostDataVariable(self::$formPassword);
         $this->passwordRepeat = $this->post->getPostDataVariable(self::$formPasswordRepeat);
 
-        //TODO: isEmpty, validate and sanitize helper methods
-        if (empty($this->username) && empty($this->password)) {
-            $this->messages = ['Username has too few characters, at least 3 characters.', 'Password has too few characters, at least 6 characters.'];
-        } else if (strlen($this->username) < 3) {
-            $this->messages = ['Username has too few characters, at least 3 characters.'];
-        } else if (strlen($this->password) < 6) {
-            $this->messages = ['Password has too few characters, at least 6 characters.'];
-        } else if ($this->password != $this->passwordRepeat){
-            $this->messages = ["Passwords do not match."];
-        } else if (strlen(strip_tags($this->username)) < strlen($this->username)) {
-            $this->messages = ["Username contains invalid characters."];
-        } else {
+        $formValidator = new FormValidator();
+
+        $formValidator->validateFormData();
+
+        if ($formValidator->formDataIsValid()) {
             $this->saveToDB();
+        } else {
+            $this->messages = $formValidator->getErrorMessages();
         }
-        $messages;
+
     }
 
     /**
@@ -77,7 +69,7 @@ class RegisterController {
      * @param $user - should be the $_POST data
      * @return array response from Database->createUser().
      */
-    public function saveToDB() {
+    private function saveToDB() {
 
         $this->db = new Database();
 
