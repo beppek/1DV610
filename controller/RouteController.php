@@ -32,9 +32,11 @@ class RouteController {
      */
     public function route() {
 
+        $server = new ServerController();
+
         if ($this->session->isLoggedIn()) {
             $this->loginWithSession();
-        } else if ($this->urlParamIsRegister()) {
+        } else if ($server->urlParamIsRegister()) {
             $this->gotoRegisterPage();
         } else if ($this->cookie->exists(self::$cookieUsername)) {
             $this->loginWithCookie();
@@ -56,13 +58,6 @@ class RouteController {
 
     private function gotoLoginPage($isLoggedIn) {
         $this->layoutView->render($isLoggedIn, $this->loginView, $this->dateTimeView);
-    }
-
-    private function urlParamIsRegister() {
-        if (isset($_GET['register'])) {
-            return true;
-        }
-        return false;
     }
 
     private function gotoRegisterPage() {

@@ -1,6 +1,9 @@
 # Login_1DV610
 Interface repository for 1DV610 assignment 2 and 4
 
+## Status
+This application fulfills 100% of the requirements set out in the description of [Assignment 4](https://coursepress.lnu.se/kurs/introduktion-till-mjukvarukvalitet/assignments/a4-requirements-and-code-quality/) in Introduction to Software Quality
+
 ## To make this application work locally follow the steps below
 1. Clone the repo
 2. Create settings.php containing information as described below
@@ -24,3 +27,6 @@ class Secrets {
 
 }
 ```
+
+## Test Application
+To test the application manually go to http://www.workingholidayguiden.se/tillf/uni/1dv610/

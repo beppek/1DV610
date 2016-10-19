@@ -47,8 +47,8 @@ class LayoutView {
     }
 
     private function renderLink() {
-
-        if (isset($_GET["register"])) {
+        $server = new ServerController();
+        if ($server->urlParamIsRegister()) {
             $link = '<a href="?">Back to login</a>';
         } else {
             $link = '<a href="?register">Register a new user</a>';
