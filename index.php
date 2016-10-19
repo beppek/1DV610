@@ -19,6 +19,7 @@ require_once('model/exceptions/MySQLQueryException.php');
 require_once('model/exceptions/WrongCookieInfoException.php');
 require_once('model/exceptions/ConnectionException.php');
 
+require_once('view/500.php');
 require_once('view/DateTimeView.php');
 require_once('view/FormView.php');
 require_once('view/LayoutView.php');
@@ -27,11 +28,10 @@ require_once('view/RegisterView.php');
 
 require_once('secrets.php');
 
-//TODO: Turn off for final submission
-//MAKE SURE ERRORS ARE SHOWN... MIGHT WANT TO TURN THIS OFF ON A PUBLIC SERVER
-error_reporting(E_ALL);
-ini_set('display_errors', 'On');
-
 $router = new RouteController();
-
-$router->route();
+try {
+    $router->route();
+} catch (Exception $e) {
+    $errorPage = new InternalServerError();
+    $errorPage->render500ErrorPage();
+}
