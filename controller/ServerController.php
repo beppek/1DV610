@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Helper method to abstract the $_SERVER superglobal
+ */
 class ServerController {
 
     public function requestMethod() {

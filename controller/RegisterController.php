@@ -26,6 +26,11 @@ class RegisterController {
         $this->cookie = new Cookie();
     }
 
+    /**
+     * Routes the page request
+     * Main access point of class
+     * @return void but sets messages to be displayed in view
+     */
     public function handleRequest() {
 
         if ($this->server->requestMethodIsPost()) {
@@ -40,6 +45,9 @@ class RegisterController {
         return $this->messages;
     }
 
+    /**
+     * Only call from handleRequest method
+     */
     private function registerUser() {
 
         $this->post = new PostData();
@@ -59,6 +67,9 @@ class RegisterController {
 
     }
 
+    /**
+     * Only call after input has been validated
+     */
     private function saveToDB() {
 
         $this->db = new Database();

@@ -69,10 +69,12 @@ class RegisterView extends FormView {
         return $htmlOutput;
     }
 
+    /**
+     * @return string $username if set in post
+     */
     private function getUsername() {
 		$username;
 		$post = new PostData();
-		$sessionUsername = 'username';
 
 		if ($post->postVariableisSet(self::$name)) {
 			$username = $post->getSanitizedPostVariable(self::$name);

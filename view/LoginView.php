@@ -83,6 +83,9 @@ class LoginView extends FormView {
 		';
 	}
 
+	/**
+     * @return string $username if set in post or session
+     */
 	private function getUsername() {
 		$username;
 		$post = new PostData();

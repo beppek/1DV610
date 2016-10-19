@@ -1,17 +1,21 @@
 <?php
 
+/**
+ * Helper class for $_SESSION superglobal
+ * Handles common session operations
+ */
 class Session {
 
     private $userAgent;
 
-    function __construct() {
+    public function __construct() {
 
         $this->startSession();
         $this->userAgent = new UserAgent();
 
     }
 
-    function startSession() {
+    public function startSession() {
         if (session_status() == PHP_SESSION_NONE) {
             ini_set( 'session.use_trans_sid', false );
             ini_set( 'session.cookie_httponly', true );
@@ -20,44 +24,50 @@ class Session {
         }
     }
 
-    function isHijacked() {
+    /**
+     * @return boolean true if session is hijacked
+     */
+    public function isHijacked() {
         if (!$this->userAgent->isSame()) {
             return true;
         }
         return false;
     }
 
-    function setSessionVariable($name, $value) {
+    public function setSessionVariable($name, $value) {
         $_SESSION[$name] = $value;
     }
 
-    function unsetSessionVariable($sessionVariable) {
+    public function unsetSessionVariable($sessionVariable) {
         unset($_SESSION[$sessionVariable]);
     }
 
-    function getSessionVariable($sessionVariable) {
+    public function getSessionVariable($sessionVariable) {
         return $_SESSION[$sessionVariable];
     }
 
-    function isLoggedIn() {
+    /**
+     * @return boolean true if session is logged in
+     */
+    public function isLoggedIn() {
         if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true ) {
             return true;
         }
         return false;
     }
 
-    function regenerateId() {
+    public function regenerateId() {
         session_regenerate_id();
     }
 
-    function exists($name) {
+    public function exists($name) {
         if (isset($_SESSION[$name])) {
             return true;
         }
         return false;
     }
 
-    function destroy() {
+    public function destroy() {
         session_destroy();
     }
 

@@ -25,6 +25,11 @@ class RouteController {
 
     }
 
+    /**
+     * Only access point of class
+     * Routes requests through the application
+     * Call from index.php
+     */
     public function route() {
 
         if ($this->session->isLoggedIn()) {
@@ -49,23 +54,23 @@ class RouteController {
         $this->gotoLoginPage($isLoggedIn);
     }
 
-    public function gotoLoginPage($isLoggedIn) {
+    private function gotoLoginPage($isLoggedIn) {
         $this->layoutView->render($isLoggedIn, $this->loginView, $this->dateTimeView);
     }
 
-    public function urlParamIsRegister() {
+    private function urlParamIsRegister() {
         if (isset($_GET['register'])) {
             return true;
         }
         return false;
     }
 
-    public function gotoRegisterPage() {
+    private function gotoRegisterPage() {
         $isLoggedIn = false;
         $this->layoutView->render($isLoggedIn, $this->registerView, $this->dateTimeView);
     }
 
-    public function loginWithCookie() {
+    private function loginWithCookie() {
 
         $db = new Database();
         $name = $this->cookie->getValue(self::$cookieUsername);

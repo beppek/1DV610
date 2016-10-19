@@ -4,8 +4,11 @@ class DateTimeView {
 
 	public function show() {
 
-		//TODO: create vars for the date objects
-		$timeString = date("l") . ", the " . date("jS") . " of " . date("F Y") . ", The time is " . date("H:i:s");
+		$weekday = date("l");
+        $dayOfMonth = date("jS");
+        $monthAndYear = date("F Y");
+        $time24Hour = date("H:i:s");
+		$timeString =  $weekday . ", the " . $dayOfMonth . " of " . $monthAndYear . ", The time is " . $time24Hour;
 
 		return '<p>' . $timeString . '</p>';
 	}

@@ -6,6 +6,7 @@ class LayoutView {
    * Renders the view based on user interaction
    *
    * @param FormView $v - Abstract class. Use inheritance for call
+   * @param $isLoggedIn boolean
    */
   public function render($isLoggedIn, FormView $v, DateTimeView $dtv) {
     echo '<!DOCTYPE html>
@@ -28,6 +29,10 @@ class LayoutView {
     ';
   }
 
+  /**
+   * @param $isLoggedIn boolean
+   * @return string HTML heading
+   */
   private function renderIsLoggedIn($isLoggedIn) {
     if ($isLoggedIn) {
       return '<h2>Logged in</h2>';

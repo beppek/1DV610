@@ -29,6 +29,7 @@ require_once('view/RegisterView.php');
 require_once('secrets.php');
 
 $router = new RouteController();
+
 try {
     $router->route();
 } catch (Exception $e) {

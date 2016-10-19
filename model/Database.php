@@ -18,7 +18,7 @@ class Database {
 
     /**
      * Constructor creates Database and tables if not exists.
-     * @throws Exception a Pokemon exception - gotta catch 'em all!
+     * @throws Exception if encounters errors creating database or tables
      */
     public function __construct() {
 

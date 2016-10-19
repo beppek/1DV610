@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Helper class to handle post data
+ * Use after POST request has been made
+ * Gives you access to common operations on $_POST superglobal
+ */
 class PostData {
 
     public function getPostData() {

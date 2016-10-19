@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Helper class to check HTTP_USER_AGENT to prevent session hijacking
+ */
 class UserAgent {
 
     public function __construct() {

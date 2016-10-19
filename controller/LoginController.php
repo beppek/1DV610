@@ -29,6 +29,11 @@ class LoginController {
         $this->cookie = new Cookie();
     }
 
+    /**
+     * Routes the page request
+     * Main access point of class
+     * @return void but sets messages to be displayed in view
+     */
     public function handleRequest() {
 
 		if ($this->server->requestMethodIsPost()) {
@@ -42,7 +47,7 @@ class LoginController {
 
     }
 
-    public function handleUserData() {
+    private function handleUserData() {
         $this->post = new PostData();
         $this->username = $this->post->getPostDataVariable(self::$formUsername);
         $this->password = $this->post->getPostDataVariable(self::$formPassword);
@@ -61,7 +66,7 @@ class LoginController {
         return $this->message;
     }
 
-    public function login() {
+    private function login() {
 
         if (empty($this->username)) {
             $emptyUsernameMessage = 'Username is missing';
@@ -75,7 +80,10 @@ class LoginController {
 
     }
 
-    public function authenticate() {
+    /**
+     * Only call when input has been validated
+     */
+    private function authenticate() {
 
         $this->db = new Database();
 
@@ -102,7 +110,7 @@ class LoginController {
 
     }
 
-    public function handleKeepLoggedIn() {
+    private function handleKeepLoggedIn() {
 
         $welcomeMessage;
         if ($this->shouldStayLoggedIn()) {
@@ -113,7 +121,7 @@ class LoginController {
                 $this->cookie->set(self::$cookiePassword, $randomHash);
                 $welcomeMessage = 'Welcome and you will be remembered';
             } catch (Exception $e) {
-                $welcomeMessage = "Welcome";
+                $welcomeMessage = 'Welcome';
             }
         } else {
             $welcomeMessage = 'Welcome';
@@ -123,14 +131,14 @@ class LoginController {
 
     }
 
-    public function shouldStayLoggedIn() {
+    private function shouldStayLoggedIn() {
         if ($this->post->getPostDataVariable(self::$keep) === 'on') {
             return true;
         }
         return false;
     }
 
-    public function logout() {
+    private function logout() {
 
         $this->cookie->delete(self::$cookieName);
         $this->cookie->delete(self::$cookiePassword);
