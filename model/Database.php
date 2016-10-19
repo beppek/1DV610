@@ -1,7 +1,5 @@
 <?php
 
-require_once('secrets.php');
-
 /**
  * Database class to handle calls to the database
  * Usage: require_once("..\model\Database.php");
@@ -9,23 +7,32 @@ require_once('secrets.php');
  */
 class Database {
 
+    private static $usersTable = 'users';
+    private static $cookiesTable = 'cookies';
+
     private $db_name;
 	private $db_user;
 	private $db_pass;
 	private $db_host;
 
+
     public function __construct() {
+
         $secrets = new Secrets();
 
-        //TODO: Include host in secrets file
         $this->db_name = $secrets->db_name;
         $this->db_user = $secrets->db_user;
         $this->db_pass = $secrets->db_pass;
         $this->db_host = $secrets->db_host;
 
-        $this->createDatabase();
-        $this->createUserTable();
-        $this->createCookieTable();
+        try {
+            $this->createDatabase();
+            $this->createTable(self::$usersTable);
+            $this->createTable(self::$cookiesTable);
+        } catch (Exception $e) {
+            //TODO: Write to error log
+        }
+
     }
 
     /**
@@ -34,110 +41,57 @@ class Database {
      */
     private function createDatabase() {
 
-        //TODO: Use connect method
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass);
         if ($mysqli->connect_error) {
-            die("Connection failed: " . $mysqli->connect_error);
+            throw new Exception('Connection failed: ' . $mysqli->connect_error);
         }
 
-        $sql = "CREATE DATABASE IF NOT EXISTS workingholidayg";
-        if ($mysqli->query($sql) === TRUE) {
-            return true;
-        } else {
-            return false;
-        }
-
-        //TODO: Unreachable
+        $dbWasCreated;
+        $sql = 'CREATE DATABASE IF NOT EXISTS' . $this->db_name;
+        $mysqli->query($sql);
         $mysqli->close();
 
     }
 
     /**
      * Creates connection to MySQL server.
+     * Do not call from constructor as database may not exist.
      */
     public function connect() {
 
-        //TODO: Rewrite method to be able to use from constructor
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
-
         if ($mysqli->connect_errno) {
-            printf("Connect failed: %s\n", $mysqli->connect_error);
-            $this->connected = false;
-            exit();
+            throw new Exception('Connection failed: ' . $mysqli->connect_error);
         }
-
-        //TODO: Do I need this?
-        $this->connected = true;
 
         return $mysqli;
 
     }
 
     /**
-     * Disconnects if connection exists
+     * Disconnects from database. Call after database operations are complete.
      */
     public function disconnect($mysqli) {
-
-        //TODO: Do I need this?
-        if ($this->connected != false) {
-            $mysqli->close();
-            $this->connected = false;
-        }
-
+        $mysqli->close();
     }
 
     /**
-     * Create user table in database if not exists
+     * Create table in database if not exists
      * Only call from constructor
-     * @return string - only if error creating table
-     * TODO: Fix return
      */
-    private function createUserTable() {
+    private function createTable($tableName) {
 
         $mysqli = $this->connect();
 
-        $sql = "CREATE TABLE IF NOT EXISTS users (
+        $sql = 'CREATE TABLE IF NOT EXISTS ' . $tableName . ' (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(30) NOT NULL,
         password VARCHAR(255) NOT NULL,
         reg_date TIMESTAMP
-        )";
+        )';
 
-        //TODO: Rewrite to remove empty if statement
-        //TODO: Break out to query method
-        if ($mysqli->query($sql) === TRUE) {
-
-        } else {
-            return "Error creating table: " . $mysqli->error;
-        }
-
-        $this->disconnect($mysqli);
-
-    }
-
-    /**
-     * Create cookie table in database if not exists
-     * Only call from constructor
-     * @return string - only if error creating table return
-     * TODO: Fix return
-     */
-    private function createCookieTable() {
-
-        $mysqli = $this->connect();
-
-        $sql = "CREATE TABLE IF NOT EXISTS cookies (
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        cookiename VARCHAR(30) NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        reg_date TIMESTAMP
-        )";
-
-        //TODO: Rewrite to remove empty if statement
-        //TODO: Break out to query method
-        if ($mysqli->query($sql) === TRUE) {
-
-        } else {
-            return "Error creating table: " . $mysqli->error;
+        if ($mysqli->query($sql) === false) {
+            throw new Exception("Error creating table: " . $mysqli->error);
         }
 
         $this->disconnect($mysqli);
@@ -146,8 +100,9 @@ class Database {
 
     /**
      * Create user in database
-     * @return string with information on the result
-     * TODO: Better return
+     * @throws UserExistsException
+     * @throws Exception - if error writing to database
+     * @return void
      */
     public function createUser($username, $password) {
 
@@ -156,20 +111,16 @@ class Database {
         $mysqli = $this->connect();
 
         if ($this->findUser($username)) {
-            return "User exists, pick another username.";
+            throw new UserExistsException();
         }
 
         $sql = "INSERT INTO users (username, password)
         VALUES ('$username', '$hashedPassword')";
 
-        //TODO: Break out to query method
-        if ($mysqli->query($sql) === TRUE) {
-           return "Registered new user.";
-        } else {
-            return $mysqli->error;
+        if ($mysqli->query($sql) === false) {
+            throw new Exception($mysqli->error);
         }
 
-        //TODO: Unreachable
         $this->disconnect($mysqli);
 
     }

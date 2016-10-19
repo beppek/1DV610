@@ -1,7 +1,5 @@
 <?php
 
-require_once('model/PostData.php');
-
 class FormValidator {
 
     private static $formUsername = 'RegisterView::UserName';
@@ -25,28 +23,11 @@ class FormValidator {
         $this->passwordRepeat = $this->post->getPostDataVariable(self::$formPasswordRepeat);
     }
 
-    public function formDataIsValid() {
-
-        $isValid;
-        if ($this->numOfErrorMessages() === 0){
-            $isValid = true;
-        } else {
-            $isValid = false;
-        }
-
-        return $isValid;
-
-    }
-
     public function validateFormData() {
         $this->validateUsernameLength();
         $this->validatePasswordLength();
         $this->passwordsMatch();
         $this->containsInvalidCharacters($this->username);
-    }
-
-    private function numOfErrorMessages() {
-        return count($this->errorMessages);
     }
 
     private function validateUsernameLength() {
@@ -91,6 +72,23 @@ class FormValidator {
 
     private function addErrorMessage($errorMessage) {
         array_push($this->errorMessages, $errorMessage);
+    }
+
+    public function formDataIsValid() {
+
+        $isValid;
+        if ($this->numOfErrorMessages() === 0){
+            $isValid = true;
+        } else {
+            $isValid = false;
+        }
+
+        return $isValid;
+
+    }
+
+    private function numOfErrorMessages() {
+        return count($this->errorMessages);
     }
 
     public function getErrorMessages() {

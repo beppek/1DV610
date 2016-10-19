@@ -1,17 +1,12 @@
 <?php
 
-require_once("model/Database.php");
-require_once('controller/ServerController.php');
-require_once('model/Session.php');
-require_once('model/PostData.php');
-require_once('model/Cookie.php');
-require_once('controller/FormValidator.php');
-
 class RegisterController {
 
     private static $formUsername = 'RegisterView::UserName';
     private static $formPassword = 'RegisterView::Password';
     private static $formPasswordRepeat = 'RegisterView::PasswordRepeat';
+    private static $sessionMessage = 'message';
+    private static $sessionUsername = 'username';
 
     private $db;
     private $server;
@@ -25,6 +20,7 @@ class RegisterController {
     private $passwordRepeat;
 
     public function __construct() {
+        $this->messages = [];
         $this->server = new ServerController();
         $this->session = new Session();
         $this->cookie = new Cookie();
@@ -53,7 +49,6 @@ class RegisterController {
         $this->passwordRepeat = $this->post->getPostDataVariable(self::$formPasswordRepeat);
 
         $formValidator = new FormValidator();
-
         $formValidator->validateFormData();
 
         if ($formValidator->formDataIsValid()) {
@@ -64,32 +59,31 @@ class RegisterController {
 
     }
 
-    /**
-     * Register user.
-     * @param $user - should be the $_POST data
-     * @return array response from Database->createUser().
-     */
     private function saveToDB() {
 
         $this->db = new Database();
 
-        //TODO: Better variable name
-        $res[] = $this->db->createUser($this->username, $this->password);
+        try {
 
-        //TODO: String dependency.
-        if ($res[0] == "Registered new user.") {
+            $result[] = $this->db->createUser($this->username, $this->password);
+            $message = 'Registered new user.';
 
-            //TODO: Session controller
-            $_SESSION["username"] = $this->username;
-            $_SESSION["message"] = $res[0];
-            session_regenerate_id();
+            $this->session->setSessionVariable(self::$sessionUsername, $this->username);
+            $this->session->setSessionVariable(self::$sessionMessage, $message);
+            $this->session->regenerateId();
 
-            //TODO: Redirect controller
-            header("Location: " . $_SERVER['PHP_SELF']);
-        } else {
-            $this->messages = $res;
+            $this->server->redirectToSelf();
+
+        } catch (UserExistsException $e) {
+            $this->addMessage('User exists, pick another username.');
+        } catch(Exception $e) {
+            $this->addMessage('There was a problem connecting to the database.');
         }
 
+    }
+
+    private function addMessage($message) {
+        array_push($this->messages, $message);
     }
 
 }

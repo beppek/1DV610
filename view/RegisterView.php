@@ -1,8 +1,5 @@
 <?php
 
-require_once('controller/RegisterController.php');
-require_once('view/FormView.php');
-
 class RegisterView extends FormView {
     private static $register = 'RegisterView::Register';
     private static $name = 'RegisterView::UserName';

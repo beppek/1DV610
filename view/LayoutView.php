@@ -1,7 +1,5 @@
 <?php
 
-require_once('model/Session.php');
-
 class LayoutView {
 
   /**

@@ -1,11 +1,5 @@
 <?php
 
-require_once('model/Database.php');
-require_once('controller/ServerController.php');
-require_once('model/Session.php');
-require_once('model/PostData.php');
-require_once('model/Cookie.php');
-
 class LoginController {
 
     private static $sessionMessage = 'message';

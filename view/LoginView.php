@@ -1,10 +1,5 @@
 <?php
 
-require_once('controller/LoginController.php');
-require_once('view/FormView.php');
-require_once('model/Session.php');
-require_once('model/PostData.php');
-
 class LoginView extends FormView {
 	private static $login = 'LoginView::Login';
 	private static $logout = 'LoginView::Logout';

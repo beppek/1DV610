@@ -1,7 +1,5 @@
 <?php
 
-require_once('model/UserAgent.php');
-
 class Session {
 
     private $userAgent;
