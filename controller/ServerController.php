@@ -43,7 +43,8 @@ class ServerController {
     }
 
     public function getHashedVariable($serverVariable) {
-        return md5($this->getServerVariable($serverVariable));
+        $hashedVariable = md5($this->getServerVariable($serverVariable));
+        return $hashedVariable;
     }
 
     public function redirectToSelf() {

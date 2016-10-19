@@ -48,6 +48,7 @@ class RouteController {
     }
 
     private function loginWithSession() {
+        $isLoggedIn;
         if ($this->session->isHijacked()) {
             $isLoggedIn = false;
         } else {
