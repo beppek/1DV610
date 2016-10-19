@@ -7,11 +7,11 @@ class LoginController {
     private static $sessionUsername = 'username';
 
     private static $logout = 'LoginView::Logout';
-	private static $formUsername = 'LoginView::UserName';
-	private static $formPassword = 'LoginView::Password';
-	private static $cookieName = 'LoginView::CookieName';
-	private static $cookiePassword = 'LoginView::CookiePassword';
-	private static $keep = 'LoginView::KeepMeLoggedIn';
+    private static $formUsername = 'LoginView::UserName';
+    private static $formPassword = 'LoginView::Password';
+    private static $cookieName = 'LoginView::CookieName';
+    private static $cookiePassword = 'LoginView::CookiePassword';
+    private static $keep = 'LoginView::KeepMeLoggedIn';
 
     private $db;
     private $server;
