@@ -26,29 +26,29 @@ class RegisterView extends FormView {
 
         $username = $this->getUsername();
 
-		return '
+        return '
             <h2>Register new user</h2>
-			<form method="post" action="?register">
-				<fieldset>
-					<legend>Register a new user - Write username and password</legend>
+            <form method="post" action="?register">
+                <fieldset>
+                    <legend>Register a new user - Write username and password</legend>
                     <p id="' . self::$messageId . '">' . $this->renderMessages($messages) . '</p>
-
-
-					<label for="' . self::$name . '">Username :</label>
-					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $username . '" />
+                    
+                    
+                    <label for="' . self::$name . '">Username :</label>
+                    <input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $username . '" />
                     <br>
-					<label for="' . self::$password . '">Password :</label>
-					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
+                    <label for="' . self::$password . '">Password :</label>
+                    <input type="password" id="' . self::$password . '" name="' . self::$password . '" />
                     <br>
                     <label for="' . self::$passwordRepeat . '">Repeat password :</label>
-					<input type="password" id="' . self::$passwordRepeat . '" name="' . self::$passwordRepeat . '" />
+                    <input type="password" id="' . self::$passwordRepeat . '" name="' . self::$passwordRepeat . '" />
                     <br>
-
-					<input type="submit" name="' . self::$register . '" value="Register" />
-				</fieldset>
-			</form>
-		';
-	}
+                    
+                    <input type="submit" name="' . self::$register . '" value="Register" />
+                </fieldset>
+            </form>
+        ';
+    }
 
     /**
      * Render messages to display inside p element
@@ -73,16 +73,16 @@ class RegisterView extends FormView {
      * @return string $username if set in post
      */
     private function getUsername() {
-		$username;
-		$post = new PostData();
+        $username;
+        $post = new PostData();
 
-		if ($post->postVariableisSet(self::$name)) {
-			$username = $post->getSanitizedPostVariable(self::$name);
-		} else {
-			$username = '';
-		}
+        if ($post->postVariableisSet(self::$name)) {
+            $username = $post->getSanitizedPostVariable(self::$name);
+        } else {
+            $username = '';
+        }
 
-		return $username;
-	}
+        return $username;
+    }
 
 }

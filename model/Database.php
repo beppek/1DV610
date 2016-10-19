@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Database class to handle calls to the database
- * Usage: require_once("model/Database.php");
- * $db = new Database();
- */
+* Database class to handle calls to the database
+* Usage: require_once("model/Database.php");
+* $db = new Database();
+*/
 class Database {
 
     private static $usersTable = 'users';
@@ -273,7 +273,6 @@ class Database {
                 $this->disconnect($mysqli);
                 return;
             }
-
         }
 
         throw new WrongCookieInfoException();

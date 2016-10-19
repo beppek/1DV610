@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Use to validate register formdata
- */
+* Use to validate register formdata
+*/
 class FormValidator {
 
     private static $formUsername = 'RegisterView::UserName';

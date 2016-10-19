@@ -36,14 +36,14 @@ class LoginController {
      */
     public function handleRequest() {
 
-		if ($this->server->requestMethodIsPost()) {
-			$this->handleUserData();
-		} else if ($this->session->exists(self::$sessionMessage)) {
-			$this->message = $this->session->getSessionVariable(self::$sessionMessage);
-			$this->session->unsetSessionVariable(self::$sessionMessage);
-		} else {
-			$this->message = '';
-		}
+        if ($this->server->requestMethodIsPost()) {
+            $this->handleUserData();
+        } else if ($this->session->exists(self::$sessionMessage)) {
+            $this->message = $this->session->getSessionVariable(self::$sessionMessage);
+            $this->session->unsetSessionVariable(self::$sessionMessage);
+        } else {
+            $this->message = '';
+        }
 
     }
 

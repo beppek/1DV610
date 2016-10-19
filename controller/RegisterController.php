@@ -35,9 +35,9 @@ class RegisterController {
 
         if ($this->server->requestMethodIsPost()) {
             $this->registerUser();
-		} else {
-			$this->messages = [];
-		}
+        } else {
+            $this->messages = [];
+        }
 
     }
 
