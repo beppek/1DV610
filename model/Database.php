@@ -64,7 +64,7 @@ class Database {
 
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
         if ($mysqli->connect_errno) {
-            throw new ConnectionException('Connection failed in connect method: ' . $mysqli->connect_error);
+            throw new ConnectionException('Connection failed: ' . $mysqli->connect_error);
         }
 
         return $mysqli;
@@ -113,14 +113,14 @@ class Database {
         $mysqli = $this->connect();
 
         if ($this->userExists($username)) {
-            throw new UserExistsException("User Exists!");
+            throw new UserExistsException();
         }
 
         $sql = "INSERT INTO users (username, password)
         VALUES ('$username', '$hashedPassword')";
 
         if ($mysqli->query($sql) === false) {
-            throw new Exception("pokemon");
+            throw new Exception();
         }
 
         $this->disconnect($mysqli);
@@ -190,7 +190,7 @@ class Database {
         $result = $mysqli->query($sql);
 
         if ($result === false) {
-            throw new MySQLQueryException("mysql query");
+            throw new MySQLQueryException();
         }
 
         if ($result->num_rows > 0) {
