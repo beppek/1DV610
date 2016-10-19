@@ -11,10 +11,8 @@ require_once('model/Cookie.php');
 require_once('model/Database.php');
 require_once('model/PostData.php');
 require_once('model/Session.php');
-require_once('model/UserAgent.php');
 
 require_once('model/exceptions/UserExistsException.php');
-require_once('model/exceptions/EmptyTableException.php');
 require_once('model/exceptions/MySQLQueryException.php');
 require_once('model/exceptions/WrongCookieInfoException.php');
 require_once('model/exceptions/ConnectionException.php');

@@ -64,7 +64,7 @@ class Database {
 
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
         if ($mysqli->connect_errno) {
-            throw new ConnectionException('Connection failed: ' . $mysqli->connect_error);
+            throw new ConnectionException('Connection failed in connect method: ' . $mysqli->connect_error);
         }
 
         return $mysqli;
@@ -113,14 +113,14 @@ class Database {
         $mysqli = $this->connect();
 
         if ($this->userExists($username)) {
-            throw new UserExistsException();
+            throw new UserExistsException("User Exists!");
         }
 
         $sql = "INSERT INTO users (username, password)
         VALUES ('$username', '$hashedPassword')";
 
         if ($mysqli->query($sql) === false) {
-            throw new Exception($mysqli->error);
+            throw new Exception("pokemon");
         }
 
         $this->disconnect($mysqli);
@@ -129,7 +129,6 @@ class Database {
 
     /**
      * @throws MySQLQueryException if mysqli query encounters error
-     * @throws EmptyTableException if database table is empty
      * @return boolean if user could be authenticated
      */
     public function authenticateUser($username, $password) {
@@ -143,21 +142,20 @@ class Database {
             throw new MySQLQueryException();
         }
 
-        if ($result->num_rows <= 0) {
-            throw new EmptyTableException();
-        }
+        if ($result->num_rows > 0) {
 
-        $users = [];
-        while($tableRow = $result->fetch_array()) {
-            $users[] = $tableRow;
-        }
+            $users = [];
+            while ($tableRow = $result->fetch_array()) {
+                $users[] = $tableRow;
+            }
 
-        foreach($users as $user) {
-            $userIsVerified = $this->verifyUser($user, $username, $password);
-            if ($userIsVerified) {
-                $result->close();
-                $this->disconnect($mysqli);
-                return true;
+            foreach ($users as $user) {
+                $userIsVerified = $this->verifyUser($user, $username, $password);
+                if ($userIsVerified) {
+                    $result->close();
+                    $this->disconnect($mysqli);
+                    return true;
+                }
             }
         }
 
@@ -182,7 +180,6 @@ class Database {
     /**
      * Find the user in database
      * @throws MySQLQueryException if mysqli query encounters error
-     * @throws EmptyTableException if database table is empty
      * @return true if user is found
      */
     public function userExists($username) {
@@ -193,23 +190,22 @@ class Database {
         $result = $mysqli->query($sql);
 
         if ($result === false) {
-            throw new MySQLQueryException();
+            throw new MySQLQueryException("mysql query");
         }
 
-        if ($result->num_rows <= 0) {
-            throw new EmptyTableException();
-        }
+        if ($result->num_rows > 0) {
 
-        $users = [];
-        while($tableRow = $result->fetch_array()) {
-            $users[] = $tableRow;
-        }
+            $users = [];
+            while ($tableRow = $result->fetch_array()) {
+                $users[] = $tableRow;
+            }
 
-        foreach($users as $user) {
-            if ($username === $user[1]) {
-                $result->close();
-                $this->disconnect($mysqli);
-                return true;
+            foreach ($users as $user) {
+                if ($username === $user[1]) {
+                    $result->close();
+                    $this->disconnect($mysqli);
+                    return true;
+                }
             }
         }
 
@@ -229,7 +225,7 @@ class Database {
 
         $mysqli = $this->connect();
 
-        $sql = "INSERT INTO cookies (cookiename, password)
+        $sql = "INSERT INTO cookies (username, password)
         VALUES ('$name', '$password')";
 
         if ($mysqli->query($sql) === false) {
@@ -243,7 +239,6 @@ class Database {
     /**
      * Find and verify the cookie
      * @throws MySQLQueryException if mysqli query encounters an error
-     * @throws EmptyTableException if database table is empty
      * @throws WrongCookieInfoException if cookie did not match stored info
      * @return void when cookie is found and matched
      */
@@ -258,20 +253,19 @@ class Database {
             throw new MySQLQueryException();
         }
 
-        if ($result->num_rows <= 0) {
-            throw new EmptyTableException();
-        }
+        if ($result->num_rows > 0) {
 
-        $cookies = [];
-        while($tableRow = $result->fetch_array()) {
-            $cookies[] = $tableRow;
-        }
+            $cookies = [];
+            while ($tableRow = $result->fetch_array()) {
+                $cookies[] = $tableRow;
+            }
 
-        foreach($cookies as $cookie) {
-            if ($name === $cookie[1] && $password === $cookie[2]) {
-                $result->close();
-                $this->disconnect($mysqli);
-                return;
+            foreach ($cookies as $cookie) {
+                if ($name === $cookie[1] && $password === $cookie[2]) {
+                    $result->close();
+                    $this->disconnect($mysqli);
+                    return;
+                }
             }
         }
 

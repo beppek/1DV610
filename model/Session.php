@@ -6,12 +6,15 @@
  */
 class Session {
 
-    private $userAgent;
+    private static $userAgent = 'HTTP_USER_AGENT';
+    private static $loggedIn = 'loggedin';
+
+    private $server;
 
     public function __construct() {
 
+        $this->server = new ServerController();
         $this->startSession();
-        $this->userAgent = new UserAgent();
 
     }
 
@@ -22,13 +25,30 @@ class Session {
             ini_set( 'session.use_only_cookies', true );
             session_start();
         }
+        $this->setUserAgent();
+    }
+
+    private function setUserAgent() {
+        if ($this->exists(self::$userAgent) == false) {
+            $newUserAgent = $this->server->getHashedVariable(self::$userAgent);
+            $this->setSessionVariable(self::$userAgent, $newUserAgent);
+        }
     }
 
     /**
      * @return boolean true if session is hijacked
      */
     public function isHijacked() {
-        if (!$this->userAgent->isSame()) {
+        if ($this->userAgentIsSame()) {
+            return false;
+        }
+        return true;
+    }
+
+    public function userAgentIsSame() {
+        $storedUserAgent = $this->getSessionVariable(self::$userAgent);
+        $hashedRequestingUserAgent = $this->server->getHashedVariable(self::$userAgent);
+        if ($storedUserAgent == $hashedRequestingUserAgent) {
             return true;
         }
         return false;
@@ -50,8 +70,10 @@ class Session {
      * @return boolean true if session is logged in
      */
     public function isLoggedIn() {
-        if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true ) {
-            return true;
+        if ($this->exists(self::$loggedIn)) {
+            if ($this->getSessionVariable(self::$loggedIn) == true) {
+                return true;
+            }
         }
         return false;
     }
