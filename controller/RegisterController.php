@@ -65,7 +65,7 @@ class RegisterController {
 
         try {
 
-            $result[] = $this->db->createUser($this->username, $this->password);
+            $this->db->createUser($this->username, $this->password);
             $message = 'Registered new user.';
 
             $this->session->setSessionVariable(self::$sessionUsername, $this->username);

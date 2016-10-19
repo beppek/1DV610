@@ -127,34 +127,41 @@ class Database {
 
     /**
      * Find and authenticate the user
-     * @return true if user is found and password is correct, else returns false
+     * @throws MySQLQueryException if mysqli query encounters error
+     * @throws EmptyTableException if database table is empty
+     * @return boolean $isAuthenticated
      */
     public function authenticateUser($username, $password) {
 
+        $isAuthenticated = false;
         $mysqli = $this->connect();
 
-        //TODO: Can I break out  to query method?
-        if ($result = $mysqli->query("SELECT * FROM users")) {
-            if ($result->num_rows > 0) {
+        $sql = "SELECT * FROM " . self::$usersTable;
+        $result = $mysqli->query($sql);
 
-                //TODO: Rename vars $rows[] -> $users[] and $row -> $user
-                while($row = $result->fetch_array()) {
-                    $rows[] = $row;
-                }
-
-                foreach($rows as $row) {
-                    if ($username === $row[1] && password_verify($password, $row[2])) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-            $result->close();
+        if ($result === false) {
+            throw new MySQLQueryException();
         }
-        $this->disconnect($mysqli);
 
-        return false;
+        if ($result->num_rows <= 0) {
+            throw new EmptyTableException();
+        }
+
+        $users = [];
+        while($tableRow = $result->fetch_array()) {
+            $users[] = $tableRow;
+        }
+
+        foreach($users as $user) {
+            if ($username === $user[1] && password_verify($password, $user[2])) {
+                $isAuthenticated = true;
+            }
+        }
+
+        $result->close();
+        $this->disconnect($mysqli);
+        return $isAuthenticated;
+
     }
 
     /**

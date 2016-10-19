@@ -5,11 +5,6 @@ class RegisterView extends FormView {
     private static $name = 'RegisterView::UserName';
     private static $password = 'RegisterView::Password';
     private static $passwordRepeat = 'RegisterView::PasswordRepeat';
-    //TODO: Do I need these?
-    //***
-	//private static $cookieName = 'RegisterView::CookieName';
-	//private static $cookiePassword = 'RegisterView::CookiePassword';
-    //***
     private static $messageId = 'RegisterView::Message';
 
     /**
@@ -29,12 +24,7 @@ class RegisterView extends FormView {
 
      private function generateRegisterFormHTML($messages) {
 
-        //TODO: Break out to helper method
-        if (isset($_POST['RegisterView::UserName'])) {
-			$username = strip_tags($_POST['RegisterView::UserName']);
-		} else {
-			$username = '';
-		}
+        $username = $this->getUsername();
 
 		return '
             <h2>Register new user</h2>
@@ -79,5 +69,18 @@ class RegisterView extends FormView {
         return $htmlOutput;
     }
 
+    private function getUsername() {
+		$username;
+		$post = new PostData();
+		$sessionUsername = 'username';
+
+		if ($post->postVariableisSet(self::$name)) {
+			$username = $post->getSanitizedPostVariable(self::$name);
+		} else {
+			$username = '';
+		}
+
+		return $username;
+	}
 
 }
