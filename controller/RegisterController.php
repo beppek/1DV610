@@ -88,7 +88,7 @@ class RegisterController {
         } catch (UserExistsException $e) {
             $this->addMessage('User exists, pick another username.');
         } catch(Exception $e) {
-            $this->addMessage($e->getMessage());
+            $this->addMessage('There was a problem connecting to the database.');
         }
 
     }
