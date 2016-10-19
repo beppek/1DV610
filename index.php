@@ -13,9 +13,11 @@ require_once('model/PostData.php');
 require_once('model/Session.php');
 require_once('model/UserAgent.php');
 
-require_once('model/UserExistsException.php');
-require_once('model/EmptyTableException.php');
-require_once('model/MySQLQueryException.php');
+require_once('model/exceptions/UserExistsException.php');
+require_once('model/exceptions/EmptyTableException.php');
+require_once('model/exceptions/MySQLQueryException.php');
+require_once('model/exceptions/WrongCookieInfoException.php');
+require_once('model/exceptions/ConnectionException.php');
 
 require_once('view/DateTimeView.php');
 require_once('view/FormView.php');

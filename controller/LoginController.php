@@ -79,8 +79,15 @@ class LoginController {
 
         $this->db = new Database();
 
-        if ($this->db->authenticateUser($this->username, $this->password)) {
+        try {
+            $isAuthenticated = $this->db->authenticateUser($this->username, $this->password);
+        } catch (Exception $e) {
+            $failedLoginMessage = 'Oops, database error. Try again later.';
+            $this->message = $failedLoginMessage;
+            return;
+        }
 
+        if ($isAuthenticated) {
             $this->session->setSessionVariable(self::$sessionUsername, $this->username);
 
             $this->handleKeepLoggedIn();
@@ -88,10 +95,10 @@ class LoginController {
             $this->session->regenerateId();
 
             $this->server->redirectToSelf();
-       } else {
+        } else {
             $failedLoginMessage = 'Wrong name or password';
             $this->message = $failedLoginMessage;
-       }
+        }
 
     }
 
@@ -100,10 +107,14 @@ class LoginController {
         $welcomeMessage;
         if ($this->shouldStayLoggedIn()) {
             $randomHash = md5(uniqid('', true));
-            $this->db->storeCookie($this->username, $randomHash);
-            $this->cookie->set(self::$cookieName, $this->username);
-            $this->cookie->set(self::$cookiePassword, $randomHash);
-            $welcomeMessage = 'Welcome and you will be remembered';
+            try {
+                $this->db->storeCookie($this->username, $randomHash);
+                $this->cookie->set(self::$cookieName, $this->username);
+                $this->cookie->set(self::$cookiePassword, $randomHash);
+                $welcomeMessage = 'Welcome and you will be remembered';
+            } catch (Exception $e) {
+                $welcomeMessage = "Welcome";
+            }
         } else {
             $welcomeMessage = 'Welcome';
         }

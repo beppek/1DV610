@@ -76,15 +76,13 @@ class RouteController {
 
         $isLoggedIn;
 
-        if ($db->verifyCookie($name, $password)) {
-
+        try {
+            $db->verifyCookie($name, $password);
             $successMessage = 'Welcome back with cookie';
-
             $this->session->setSessionVariable($sessionMessage, $successMessage);
             $this->session->setSessionVariable($sessionLoggedIn, true);
             $isLoggedIn = true;
-
-        } else {
+        } catch (WrongCookieInfoException $e) {
 
             $wrongCookieInfoMessage = 'Wrong information in cookies';
 
@@ -93,6 +91,9 @@ class RouteController {
             $this->session->setSessionVariable($sessionMessage, $wrongCookieInfoMessage);
             $isLoggedIn = false;
 
+        } catch (Exception $e) {
+            $errorMessage = 'Something went wrong, try again later';
+            $this->session->setSessionVariable($sessionMessage, $errorMessage);
         }
 
         $this->gotoLoginPage($isLoggedIn);

@@ -2,7 +2,7 @@
 
 /**
  * Database class to handle calls to the database
- * Usage: require_once("..\model\Database.php");
+ * Usage: require_once("model/Database.php");
  * $db = new Database();
  */
 class Database {
@@ -16,6 +16,10 @@ class Database {
 	private $db_host;
 
 
+    /**
+     * Constructor creates Database and tables if not exists.
+     * @throws Exception a Pokemon exception - gotta catch 'em all!
+     */
     public function __construct() {
 
         $secrets = new Secrets();
@@ -30,7 +34,7 @@ class Database {
             $this->createTable(self::$usersTable);
             $this->createTable(self::$cookiesTable);
         } catch (Exception $e) {
-            //TODO: Write to error log
+            throw $e;
         }
 
     }
@@ -43,10 +47,9 @@ class Database {
 
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass);
         if ($mysqli->connect_error) {
-            throw new Exception('Connection failed: ' . $mysqli->connect_error);
+            throw new ConnectionException('Connection failed: ' . $mysqli->connect_error);
         }
 
-        $dbWasCreated;
         $sql = 'CREATE DATABASE IF NOT EXISTS' . $this->db_name;
         $mysqli->query($sql);
         $mysqli->close();
@@ -55,13 +58,13 @@ class Database {
 
     /**
      * Creates connection to MySQL server.
-     * Do not call from constructor as database may not exist.
+     * Do not call from createDatabase method as database may not exist.
      */
-    public function connect() {
+    private function connect() {
 
         $mysqli = new mysqli($this->db_host, $this->db_user, $this->db_pass, $this->db_name);
         if ($mysqli->connect_errno) {
-            throw new Exception('Connection failed: ' . $mysqli->connect_error);
+            throw new ConnectionException('Connection failed: ' . $mysqli->connect_error);
         }
 
         return $mysqli;
@@ -71,7 +74,7 @@ class Database {
     /**
      * Disconnects from database. Call after database operations are complete.
      */
-    public function disconnect($mysqli) {
+    private function disconnect($mysqli) {
         $mysqli->close();
     }
 
@@ -99,7 +102,6 @@ class Database {
     }
 
     /**
-     * Create user in database
      * @throws UserExistsException
      * @throws Exception - if error writing to database
      * @return void
@@ -110,7 +112,7 @@ class Database {
 
         $mysqli = $this->connect();
 
-        if ($this->findUser($username)) {
+        if ($this->userExists($username)) {
             throw new UserExistsException();
         }
 
@@ -126,14 +128,12 @@ class Database {
     }
 
     /**
-     * Find and authenticate the user
      * @throws MySQLQueryException if mysqli query encounters error
      * @throws EmptyTableException if database table is empty
-     * @return boolean $isAuthenticated
+     * @return boolean if user could be authenticated
      */
     public function authenticateUser($username, $password) {
 
-        $isAuthenticated = false;
         $mysqli = $this->connect();
 
         $sql = "SELECT * FROM " . self::$usersTable;
@@ -153,53 +153,77 @@ class Database {
         }
 
         foreach($users as $user) {
-            if ($username === $user[1] && password_verify($password, $user[2])) {
-                $isAuthenticated = true;
+            $userIsVerified = $this->verifyUser($user, $username, $password);
+            if ($userIsVerified) {
+                $result->close();
+                $this->disconnect($mysqli);
+                return true;
             }
         }
 
         $result->close();
         $this->disconnect($mysqli);
-        return $isAuthenticated;
+        return false;
 
+    }
+
+    private function verifyUser($storedUser, $candidateUsername, $candidatePassword) {
+        $storedUsername = $storedUser[1];
+        $storedPassword = $storedUser[2];
+
+        $usernameIsVerified = $candidateUsername === $storedUsername;
+        $passWordIsVerified = password_verify($candidatePassword, $storedPassword);
+        if ($usernameIsVerified && $passWordIsVerified) {
+            return true;
+        }
+        return false;
     }
 
     /**
      * Find the user in database
+     * @throws MySQLQueryException if mysqli query encounters error
+     * @throws EmptyTableException if database table is empty
      * @return true if user is found
      */
-    public function findUser($username) {
+    public function userExists($username) {
 
         $mysqli = $this->connect();
 
-        //TODO: Query method?
-        if ($result = $mysqli->query("SELECT * FROM users")) {
-            if ($result->num_rows > 0) {
+        $sql = "SELECT * FROM " . self::$usersTable;
+        $result = $mysqli->query($sql);
 
-                //TODO: REname vars
-                while($row = $result->fetch_array()) {
-                    $rows[] = $row;
-                }
-
-                foreach($rows as $row) {
-                    if ($username === $row[1]) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-            $result->close();
-
+        if ($result === false) {
+            throw new MySQLQueryException();
         }
-        $this->disconnect($mysqli);
 
+        if ($result->num_rows <= 0) {
+            throw new EmptyTableException();
+        }
+
+        $users = [];
+        while($tableRow = $result->fetch_array()) {
+            $users[] = $tableRow;
+        }
+
+        foreach($users as $user) {
+            if ($username === $user[1]) {
+                $result->close();
+                $this->disconnect($mysqli);
+                return true;
+            }
+        }
+
+        $result->close();
+        $this->disconnect($mysqli);
         return false;
 
     }
 
     /**
-     * Stores the cookie with password in db to verify
+     * Stores the cookie with password in database to keep login for later visit
+     * @param $name string username to store in database
+     * @param $password string
+     * @throws MySQLQueryException if mysqli encounters query error
      */
     public function storeCookie($name, $password) {
 
@@ -208,50 +232,51 @@ class Database {
         $sql = "INSERT INTO cookies (cookiename, password)
         VALUES ('$name', '$password')";
 
-        //TODO: Query method
-        if ($mysqli->query($sql) === TRUE) {
-            return true;
-        } else {
-            return $mysqli->error;
+        if ($mysqli->query($sql) === false) {
+            throw new MySQLQueryException($mysqli->error);
         }
 
-        //TODO: Unreachable
         $this->disconnect($mysqli);
 
     }
 
     /**
      * Find and verify the cookie
-     *
-     * @return true if cookie is found and password is correct, else returns false
+     * @throws MySQLQueryException if mysqli query encounters an error
+     * @throws EmptyTableException if database table is empty
+     * @throws WrongCookieInfoException if cookie did not match stored info
+     * @return void when cookie is found and matched
      */
     public function verifyCookie($name, $password) {
 
         $mysqli = $this->connect();
 
-        //TODO: Query method
-        if ($result = $mysqli->query("SELECT * FROM cookies")) {
-            if ($result->num_rows > 0) {
+        $sql = "SELECT * FROM " . self::$cookiesTable;
+        $result = $mysqli->query($sql);
 
-                while($row = $result->fetch_array()) {
-                    $rows[] = $row;
-                }
+        if ($result === false) {
+            throw new MySQLQueryException();
+        }
 
-                foreach($rows as $row) {
-                    if ($name === $row[1] && $password === $row[2]) {
-                        return true;
-                    }
+        if ($result->num_rows <= 0) {
+            throw new EmptyTableException();
+        }
 
-                }
+        $cookies = [];
+        while($tableRow = $result->fetch_array()) {
+            $cookies[] = $tableRow;
+        }
 
-                return false;
+        foreach($cookies as $cookie) {
+            if ($name === $cookie[1] && $password === $cookie[2]) {
+                $result->close();
+                $this->disconnect($mysqli);
+                return;
             }
-            $result->close();
 
         }
-        $this->disconnect($mysqli);
 
-        return false;
+        throw new WrongCookieInfoException();
     }
 
 }
