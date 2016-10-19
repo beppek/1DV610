@@ -1,60 +1,100 @@
 <?php
 
-require_once("model/Database.php");
-
 class RegisterController {
 
+    private static $formUsername = 'RegisterView::UserName';
+    private static $formPassword = 'RegisterView::Password';
+    private static $formPasswordRepeat = 'RegisterView::PasswordRepeat';
+    private static $sessionMessage = 'message';
+    private static $sessionUsername = 'username';
+
     private $db;
+    private $server;
+    private $session;
+    private $cookie;
+    private $post;
 
-    /**
-     * Check user input
-     * @return messages to display on the page
-     */
-    public function registerUser($formData) {
+    private $messages;
+    private $username;
+    private $password;
+    private $passwordRepeat;
 
-        $username = $formData["RegisterView::UserName"];
-        $password = $formData["RegisterView::Password"];
-        $passwordRepeat = $formData["RegisterView::PasswordRepeat"];
-
-        if (empty($username) && empty($password)) {
-            $messages = ['Username has too few characters, at least 3 characters.', 'Password has too few characters, at least 6 characters.'];
-        } else if (strlen($username) < 3) {
-            $messages = ['Username has too few characters, at least 3 characters.'];
-        } else if (strlen($password) < 6) {
-            $messages = ['Password has too few characters, at least 6 characters.'];
-        } else if ($password != $passwordRepeat){
-            $messages = ["Passwords do not match."];
-        } else if (strlen(strip_tags($username)) < strlen($username)) {
-            $messages = ["Username contains invalid characters."];
-        } else {
-            return $this->saveToDB($formData);
-        }
-        return $messages;
+    public function __construct() {
+        $this->messages = [];
+        $this->server = new ServerController();
+        $this->session = new Session();
+        $this->cookie = new Cookie();
     }
 
     /**
-     * Register user.
-     * @param $user should be the $_POST data
-     * @return array response from Database->createUser().
+     * Routes the page request
+     * Main access point of class
+     * @return void but sets messages to be displayed in view
      */
-    public function saveToDB($user) {
+    public function handleRequest() {
 
-        $username = $user["RegisterView::UserName"];
-        $password = $user['RegisterView::Password'];
+        if ($this->server->requestMethodIsPost()) {
+            $this->registerUser();
+        } else {
+            $this->messages = [];
+        }
+
+    }
+
+    public function getMessages() {
+        return $this->messages;
+    }
+
+    /**
+     * Only call from handleRequest method
+     */
+    private function registerUser() {
+
+        $this->post = new PostData();
+
+        $this->username = $this->post->getPostDataVariable(self::$formUsername);
+        $this->password = $this->post->getPostDataVariable(self::$formPassword);
+        $this->passwordRepeat = $this->post->getPostDataVariable(self::$formPasswordRepeat);
+
+        $formValidator = new FormValidator();
+        $formValidator->validateFormData();
+
+        if ($formValidator->formDataIsValid()) {
+            $this->saveToDB();
+        } else {
+            $this->messages = $formValidator->getErrorMessages();
+        }
+
+    }
+
+    /**
+     * Only call after input has been validated
+     */
+    private function saveToDB() {
 
         $this->db = new Database();
 
-        $res[] = $this->db->createUser($username, $password);
+        try {
 
-        if ($res[0] == "Registered new user.") {
-            $_SESSION["username"] = $username;
-            $_SESSION["message"] = $res[0];
-            session_regenerate_id();
-            return header("Location: " . $_SERVER['PHP_SELF']);
-        } else {
-            return $res;
+            $this->db->createUser($this->username, $this->password);
+            $message = 'Registered new user.';
+
+            $this->session->setSessionVariable(self::$sessionUsername, $this->username);
+            $this->session->setSessionVariable(self::$sessionMessage, $message);
+            $this->session->regenerateId();
+
+            $this->server->redirectToSelf();
+
+        } catch (UserExistsException $e) {
+            $this->addMessage('User exists, pick another username.');
+        } catch(Exception $e) {
+            $this->addMessage('There was a problem connecting to the database.');
         }
 
+    }
+
+    private function addMessage($message) {
+        array_push($this->messages, $message);
     }
 
 }

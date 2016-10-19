@@ -1,95 +1,160 @@
 <?php
 
-require_once("model/Database.php");
-
 class LoginController {
 
+    private static $sessionMessage = 'message';
+    private static $sessionLoggedIn = 'loggedin';
+    private static $sessionUsername = 'username';
+
+    private static $logout = 'LoginView::Logout';
+    private static $formUsername = 'LoginView::UserName';
+    private static $formPassword = 'LoginView::Password';
+    private static $cookieName = 'LoginView::CookieName';
+    private static $cookiePassword = 'LoginView::CookiePassword';
+    private static $keep = 'LoginView::KeepMeLoggedIn';
+
     private $db;
+    private $server;
+    private $session;
+    private $cookie;
+    private $post;
+
+    private $message;
+    private $username;
+    private $password;
+
+    public function __construct() {
+        $this->server = new ServerController();
+        $this->session = new Session();
+        $this->cookie = new Cookie();
+    }
 
     /**
-     * Checks input.
-     *
-     * @return Returns string if encounters errors otherwise chains the call to authenticate.
+     * Routes the page request
+     * Main access point of class
+     * @return void but sets messages to be displayed in view
      */
-    public function login($formData) {
+    public function handleRequest() {
 
-        $username = $formData["LoginView::UserName"];
-        $password = $formData["LoginView::Password"];
-
-        if (empty($username)) {
-            return 'Username is missing';
-        } else if (empty($password)) {
-            return 'Password is missing';
+        if ($this->server->requestMethodIsPost()) {
+            $this->handleUserData();
+        } else if ($this->session->exists(self::$sessionMessage)) {
+            $this->message = $this->session->getSessionVariable(self::$sessionMessage);
+            $this->session->unsetSessionVariable(self::$sessionMessage);
         } else {
-            return $this->authenticate($formData);
+            $this->message = '';
         }
 
-        return $message;
+    }
+
+    private function handleUserData() {
+        $this->post = new PostData();
+        $this->username = $this->post->getPostDataVariable(self::$formUsername);
+        $this->password = $this->post->getPostDataVariable(self::$formPassword);
+
+        if ($this->post->postVariableIsSet(self::$logout)) {
+            $this->logout();
+        } else if ($this->session->isLoggedIn() === false) {
+            $this->login();
+        } else {
+            $this->message = '';
+        }
+
+    }
+
+    public function getMessage() {
+        return $this->message;
+    }
+
+    private function login() {
+
+        if (empty($this->username)) {
+            $emptyUsernameMessage = 'Username is missing';
+            $this->message = $emptyUsernameMessage;
+        } else if (empty($this->password)) {
+            $emptyPasswordMessage = 'Password is missing';
+            $this->message = $emptyPasswordMessage;
+        } else {
+            $this->authenticate();
+        }
 
     }
 
     /**
-     * Function to log user in.
-     *
-     * @return only returns string if login fails. Otherwise redirect
+     * Only call when input has been validated
      */
-    public function authenticate($user) {
-        $username = $user["LoginView::UserName"];
-        $password = $user['LoginView::Password'];
-
-        if (isset($user["LoginView::KeepMeLoggedIn"]) && $user["LoginView::KeepMeLoggedIn"] === "on") {
-            $keep = true;
-        } else {
-            $keep = false;
-        }
+    private function authenticate() {
 
         $this->db = new Database();
 
-        if ($this->db->authenticateUser($username, $password)) {
-            $_SESSION["username"] = $username;
-            // $_SESSION["password"] = $password;
+        try {
+            $isAuthenticated = $this->db->authenticateUser($this->username, $this->password);
+        } catch (Exception $e) {
+            $failedLoginMessage = 'Oops, database error. Try again later.';
+            $this->message = $failedLoginMessage;
+            return;
+        }
 
-            if ($keep) {
-                $cookiePassword = md5(uniqid('', true));
-                $this->db->storeCookie($username, $cookiePassword);
-                $cookieEndDate = time() + (86400 * 30);
-                setcookie("LoginView::CookieName", $username, $cookieEndDate);
-                setcookie("LoginView::CookiePassword", $cookiePassword, $cookieEndDate);
-                $_SESSION["message"] = "Welcome and you will be remembered";
-            } else {
-                $_SESSION["message"] = "Welcome";
-            }
+        if ($isAuthenticated) {
+            $this->session->setSessionVariable(self::$sessionUsername, $this->username);
 
-            $_SESSION["loggedin"] = true;
-            session_regenerate_id();
-            return header("Location: " . $_SERVER['PHP_SELF']);
-       } else {
-            return "Wrong name or password";
-       }
+            $this->handleKeepLoggedIn();
+            $this->session->setSessionVariable(self::$sessionLoggedIn, true);
+            $this->session->regenerateId();
+
+            $this->server->redirectToSelf();
+        } else {
+            $failedLoginMessage = 'Wrong name or password';
+            $this->message = $failedLoginMessage;
+        }
 
     }
 
-    /**
-     * Logout if user is logged in
-     *
-     * @return return empty string if already logged out. Otherwise redirect
-     */
-    public function logout() {
-        if (isset($_COOKIE["username"])) {
-            setcookie("LoginView::CookieName", "", time() - 3600);
-            setcookie("LoginView::CookiePassword", "", time() - 3600);
-        }
-        if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-            unset($_SESSION["username"]);
-            // unset($_SESSION["password"]);
-            unset($_SESSION["loggedin"]);
-            $_SESSION["message"] = "Bye bye!";
-            session_regenerate_id();
-            return header("Location: " . $_SERVER['PHP_SELF']);
+    private function handleKeepLoggedIn() {
+
+        $welcomeMessage;
+        if ($this->shouldStayLoggedIn()) {
+            $randomHash = md5(uniqid('', true));
+            try {
+                $this->db->storeCookie($this->username, $randomHash);
+                $this->cookie->set(self::$cookieName, $this->username);
+                $this->cookie->set(self::$cookiePassword, $randomHash);
+                $welcomeMessage = 'Welcome and you will be remembered';
+            } catch (Exception $e) {
+                $welcomeMessage = 'Welcome';
+            }
         } else {
-            $message = "";
+            $welcomeMessage = 'Welcome';
         }
-        return $message;
+
+        $this->session->setSessionVariable(self::$sessionMessage, $welcomeMessage);
+
+    }
+
+    private function shouldStayLoggedIn() {
+        if ($this->post->getPostDataVariable(self::$keep) === 'on') {
+            return true;
+        }
+        return false;
+    }
+
+    private function logout() {
+
+        $this->cookie->delete(self::$cookieName);
+        $this->cookie->delete(self::$cookiePassword);
+
+        if ($this->session->isLoggedIn()) {
+
+            $this->session->unsetSessionVariable(self::$sessionUsername);
+            $this->session->unsetSessionVariable(self::$sessionLoggedIn);
+
+            $this->session->setSessionVariable(self::$sessionMessage, 'Bye bye!');
+            $this->session->regenerateId();
+
+            $this->server->redirectToSelf();
+        } else {
+            $this->message = '';
+        }
     }
 
 }

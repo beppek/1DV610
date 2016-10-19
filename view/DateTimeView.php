@@ -2,11 +2,14 @@
 
 class DateTimeView {
 
+    public function show() {
 
-	public function show() {
+        $weekday = date("l");
+        $dayOfMonth = date("jS");
+        $monthAndYear = date("F Y");
+        $time24Hour = date("H:i:s");
+        $timeString =  $weekday . ", the " . $dayOfMonth . " of " . $monthAndYear . ", The time is " . $time24Hour;
 
-		$timeString = date("l") . ", the " . date("jS") . " of " . date("F Y") . ", The time is " . date("H:i:s");
-
-		return '<p>' . $timeString . '</p>';
-	}
+        return '<p>' . $timeString . '</p>';
+    }
 }
