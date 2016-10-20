@@ -27,6 +27,7 @@ class LoginController {
         $this->server = new ServerController();
         $this->session = new Session();
         $this->cookie = new Cookie();
+        $this->db = new Database();
     }
 
     /**
@@ -48,10 +49,8 @@ class LoginController {
     }
 
     private function handleUserData() {
-        $this->post = new PostData();
-        $this->username = $this->post->getPostDataVariable(self::$formUsername);
-        $this->password = $this->post->getPostDataVariable(self::$formPassword);
 
+        $this->post = new PostData();
         if ($this->post->postVariableIsSet(self::$logout)) {
             $this->logout();
         } else if ($this->session->isLoggedIn() === false) {
@@ -67,6 +66,9 @@ class LoginController {
     }
 
     private function login() {
+
+        $this->username = $this->post->getPostDataVariable(self::$formUsername);
+        $this->password = $this->post->getPostDataVariable(self::$formPassword);
 
         if (empty($this->username)) {
             $emptyUsernameMessage = 'Username is missing';
@@ -84,8 +86,6 @@ class LoginController {
      * Only call when input has been validated
      */
     private function authenticate() {
-
-        $this->db = new Database();
 
         try {
             $isAuthenticated = $this->db->authenticateUser($this->username, $this->password);

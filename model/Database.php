@@ -128,6 +128,8 @@ class Database {
     }
 
     /**
+     * @param string $username
+     * @param string $password - must be unhashed to use password_verify
      * @throws MySQLQueryException if mysqli query encounters error
      * @return boolean if user could be authenticated
      */
@@ -135,46 +137,28 @@ class Database {
 
         $mysqli = $this->connect();
 
-        $sql = "SELECT * FROM " . self::$usersTable;
-        $result = $mysqli->query($sql);
+        $query = "SELECT password FROM " . self::$usersTable . " WHERE username=?";
+        $preparedQuery = $mysqli->prepare($query);
 
-        if ($result === false) {
+        if ($preparedQuery == false) {
             throw new MySQLQueryException();
         }
 
-        if ($result->num_rows > 0) {
+        $preparedQuery->bind_param("s", $username);
+        $preparedQuery->execute();
+        $preparedQuery->bind_result($storedPassword);
+        $preparedQuery->fetch();
 
-            $users = [];
-            while ($tableRow = $result->fetch_array()) {
-                $users[] = $tableRow;
-            }
+        $passwordIsVerified = password_verify($password, $storedPassword);
 
-            foreach ($users as $user) {
-                $userIsVerified = $this->verifyUser($user, $username, $password);
-                if ($userIsVerified) {
-                    $result->close();
-                    $this->disconnect($mysqli);
-                    return true;
-                }
-            }
-        }
-
-        $result->close();
+        $preparedQuery->close();
         $this->disconnect($mysqli);
-        return false;
 
-    }
-
-    private function verifyUser($storedUser, $candidateUsername, $candidatePassword) {
-        $storedUsername = $storedUser[1];
-        $storedPassword = $storedUser[2];
-
-        $usernameIsVerified = $candidateUsername === $storedUsername;
-        $passWordIsVerified = password_verify($candidatePassword, $storedPassword);
-        if ($usernameIsVerified && $passWordIsVerified) {
+        if ($passwordIsVerified) {
             return true;
         }
         return false;
+
     }
 
     /**
@@ -186,47 +170,38 @@ class Database {
 
         $mysqli = $this->connect();
 
-        $sql = "SELECT * FROM " . self::$usersTable;
-        $result = $mysqli->query($sql);
+        $query = "SELECT username FROM " . self::$usersTable . " WHERE username=?";
+        $preparedQuery = $mysqli->prepare($query);
 
-        if ($result === false) {
+        if ($preparedQuery == false) {
             throw new MySQLQueryException();
         }
 
-        if ($result->num_rows > 0) {
+        $preparedQuery->bind_param("s", $username);
+        $preparedQuery->execute();
+        $preparedQuery->bind_result($storedUsername);
+        $preparedQuery->fetch();
 
-            $users = [];
-            while ($tableRow = $result->fetch_array()) {
-                $users[] = $tableRow;
-            }
-
-            foreach ($users as $user) {
-                if ($username === $user[1]) {
-                    $result->close();
-                    $this->disconnect($mysqli);
-                    return true;
-                }
-            }
+        if ($storedUsername == $username) {
+            return true;
         }
 
-        $result->close();
-        $this->disconnect($mysqli);
         return false;
 
     }
 
     /**
      * Stores the cookie with password in database to keep login for later visit
-     * @param $name string username to store in database
-     * @param $password string
+     * @param $username string
+     * @param $password string a randomly generated hash that is stored in the cookie
      * @throws MySQLQueryException if mysqli encounters query error
      */
-    public function storeCookie($name, $password) {
+    public function storeCookie($username, $password) {
 
         $mysqli = $this->connect();
 
         $sql = "INSERT INTO cookies (username, password)
-        VALUES ('$name', '$password')";
+        VALUES ('$username', '$password')";
 
         if ($mysqli->query($sql) === false) {
             throw new MySQLQueryException($mysqli->error);
@@ -242,30 +217,31 @@ class Database {
      * @throws WrongCookieInfoException if cookie did not match stored info
      * @return void when cookie is found and matched
      */
-    public function verifyCookie($name, $password) {
+    public function verifyCookie($username, $password) {
 
         $mysqli = $this->connect();
 
-        $sql = "SELECT * FROM " . self::$cookiesTable;
-        $result = $mysqli->query($sql);
+        $query = "SELECT password FROM " . self::$cookiesTable . " WHERE username=?";
+        $preparedQuery = $mysqli->prepare($query);
 
-        if ($result === false) {
+        if ($preparedQuery == false) {
             throw new MySQLQueryException();
         }
 
-        if ($result->num_rows > 0) {
+        $storedPasswords = [];
+        $preparedQuery->bind_param("s", $username);
+        $preparedQuery->execute();
+        $preparedQuery->bind_result($retrievedPassword);
+        while ($preparedQuery->fetch()) {
+            $storedPasswords[] = $retrievedPassword;
+        }
 
-            $cookies = [];
-            while ($tableRow = $result->fetch_array()) {
-                $cookies[] = $tableRow;
-            }
+        $preparedQuery->close();
+        $this->disconnect($mysqli);
 
-            foreach ($cookies as $cookie) {
-                if ($name === $cookie[1] && $password === $cookie[2]) {
-                    $result->close();
-                    $this->disconnect($mysqli);
-                    return;
-                }
+        foreach ($storedPasswords as $storedPassword) {
+            if ($storedPassword === $password) {
+                return;
             }
         }
 
